@@ -1,20 +1,9 @@
-# SO
+# Ler pdf do enunciado
 
-## Manutenção de artigos
+## Artigos.txt
 
-$ ma
-i nome preço --> insere novo artigo, mostra o código  
-n código novo nome --> altera nome do artigo  
-p código novo preço --> altera preço do artigo  
-...  
-EOF  
+* Código - Referência - Preço  
 
-## Servidor de vendas
+## Strings.txt
 
-## Cliente de vendas
-
-$ cv  
-código_numérico --> mostra no stdout stock e preço  
-código_numérico quantidade --> actualiza stock e mostra novo stock  
-...  
-EOF  
+* Referência - Nome
