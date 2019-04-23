@@ -7,3 +7,7 @@
 ## Strings.txt
 
 * Referência - Nome
+
+## Stocks.txt
+
+* Tem a quantidade de cada artigo
