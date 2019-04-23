@@ -44,8 +44,6 @@ char** tokenizeArtigoDyn(char* artigo, int* tamanho) {
 
 void replacer(char* c, char* num, int index){
 
-    char buffer[BUFFSIZE];
-    char* newline = malloc(BUFFSIZE);
     int tamanho = 0;
 
     int fPtr  = open("ARTIGOS.txt", O_RDONLY, 0666); 
@@ -57,6 +55,8 @@ void replacer(char* c, char* num, int index){
     char** info;
     while(1){
         tamanho = 0;
+        char buffer[BUFFSIZE];
+        char* newline = malloc(BUFFSIZE);
         size_t n = readln(fPtr,buffer,sizeof buffer);
         if(n <= 0) break;
         info = tokenizeArtigoDyn(buffer,&tamanho);
@@ -66,7 +66,7 @@ void replacer(char* c, char* num, int index){
             write(fTemp,newline,strlen(newline));
             jaSubstituiu = 1;
         }
-        else write(fTemp,buffer,strlen(buffer));
+        else write(fTemp,buffer,n);
     }
 
     remove("ARTIGOS.txt");
