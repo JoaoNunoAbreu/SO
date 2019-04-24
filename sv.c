@@ -7,7 +7,7 @@
 
 int main(){
     mkfifo("FIFO",0666);
-    int fdStock = open("STOCKS.txt", O_CREAT | O_WRONLY | O_APPEND , 0666);
+    int fdStock = open("STOCKS.txt", O_CREAT | O_TRUNC | O_WRONLY , 0666);
 
     while(1){
         int fd = open("FIFO", O_RDONLY); // Abre o FIFO para ler
