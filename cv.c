@@ -37,7 +37,7 @@ int main(){
 
     int tamanho = 0;
     char** info;
-    int fdFifo = open("FIFO", O_WRONLY);
+    int cv_sv = open("cv_sv", O_WRONLY);
 
     while(1){
         tamanho = 0;
@@ -85,14 +85,18 @@ int main(){
                 break;
             }
             case 2:{
-                write(fdFifo,buf,n);
-                
+                write(cv_sv,buf,n);
+                char buffer[BUFFSIZE];
+                int sv_cv = open("sv_cv", O_RDONLY);
+                int n = read(sv_cv, buffer, sizeof buffer);
+                write(1,buffer,n);
+                close(sv_cv);
                 break;
             }
             default: {write(1,"ERRO\n",5);}
         }
     }
-    close(fdFifo);  
+    close(cv_sv); 
     
     return 0; 
 } 

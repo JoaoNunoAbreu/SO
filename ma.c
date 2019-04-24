@@ -100,7 +100,7 @@ int main(){
                 case 'i':{
                     // Parte da escrita nos ficheiros
                     char* num_1stArg = concat(info[0],info[2]); // Referência - Nome
-                    write(fd2,concat(num_1stArg,"\n"),strlen(concat(num_1stArg,"\n")));
+                    write(fd2,concat(num_1stArg,"\n"),strlen(concat(num_1stArg,"\n"))); // ---------------------------------------------
                     
                     char* num_2ndArg = concat(info[0],concat(info[0],info[3])); // Código - Referência - Preço
                     write(fd1,num_2ndArg,strlen(num_2ndArg));

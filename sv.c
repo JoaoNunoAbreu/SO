@@ -52,7 +52,7 @@ char* concat(const char *s1, const char *s2){
     return result;
 }
 
-void somador(char* cod, char* new){
+char* somador(char* cod, char* new){
 
     int tamanho = 0;
 
@@ -63,6 +63,8 @@ void somador(char* cod, char* new){
 
     int jaSubstituiu = 0;
     char** info;
+    char* resultado = NULL;
+
     while(1){
         tamanho = 0;
         char buffer[BUFFSIZE];
@@ -72,14 +74,16 @@ void somador(char* cod, char* new){
             if(jaSubstituiu == 0) {
                 char* novo = concat(cod,new);
                 write(fTemp,novo,strlen(novo));
+                resultado = strdup(new);
             }
             break;
         }
         info = tokenizeArtigoDyn(buffer,&tamanho);
         if(!strcmp(info[0],cod) && jaSubstituiu == 0){
             long res = strToInt(info[1]) + strToInt(new);
-            sprintf(info[1],"%lu",res);
-            newline = strcat(concat(info[0],info[1]),"\n");
+            sprintf(info[1],"%lu\n",res);
+            resultado = strdup(info[1]);
+            newline = concat(info[0],info[1]);
             write(fTemp,newline,strlen(newline));
             jaSubstituiu = 1;
         }
@@ -87,25 +91,32 @@ void somador(char* cod, char* new){
     }
     remove("STOCKS.txt");
     rename("replace.tmp", "STOCKS.txt");
+    return resultado;
 }
 
 int main(){
 
-    mkfifo("FIFO",0666);
+    mkfifo("cv_sv",0666);
+    mkfifo("sv_cv",0666);
     int tamanho;
 
     while(1){
-        int fd = open("FIFO", O_RDONLY); // Abre o FIFO para ler
+        int cv_sv = open("cv_sv", O_RDONLY);
+        int sv_cv = open("sv_cv", O_WRONLY);
         char buf[BUFFSIZE];
         while(1){
-            int n = read(fd,buf,sizeof buf); // Lê do FIFO e guarda no array 
+            int n = read(cv_sv,buf,sizeof buf); 
             if(n <= 0) break;
             tamanho = 0;
             char** info = tokenizeArtigoDyn(buf,&tamanho);
-            if(tamanho == 2) somador(info[0],info[1]);
+            if(tamanho == 2){
+                char* res = somador(info[0],info[1]);
+                write(sv_cv,res,strlen(res));
+            }
             else write(1,"ERRO\n",5);
         }
-        close(fd);
+        close(cv_sv);
+        close(sv_cv);
     }
     return 0;
 }
