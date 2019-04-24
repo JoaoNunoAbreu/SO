@@ -42,7 +42,7 @@ char** tokenizeArtigoDyn(char* artigo, int* tamanho) {
     return artigos;
 }
 
-void replacer(char* c, char* num, int index){
+void replacer(char* cod, char* new, int index){
 
     int tamanho = 0;
 
@@ -60,15 +60,14 @@ void replacer(char* c, char* num, int index){
         size_t n = readln(fPtr,buffer,sizeof buffer);
         if(n <= 0) break;
         info = tokenizeArtigoDyn(buffer,&tamanho);
-        if(!strcmp(info[0],c) && jaSubstituiu == 0){
-            info[index] = strdup(num);
+        if(!strcmp(info[0],cod) && jaSubstituiu == 0){
+            info[index] = strdup(new);
             newline = concat(info[0],concat(info[1],info[2]));
             write(fTemp,newline,strlen(newline));
             jaSubstituiu = 1;
         }
         else write(fTemp,buffer,n);
     }
-
     remove("ARTIGOS.txt");
     rename("replace.tmp", "ARTIGOS.txt");
 }

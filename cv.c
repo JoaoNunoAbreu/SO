@@ -37,6 +37,7 @@ int main(){
 
     int tamanho = 0;
     char** info;
+    int fdFifo = open("FIFO", O_WRONLY);
 
     while(1){
         tamanho = 0;
@@ -84,15 +85,14 @@ int main(){
                 break;
             }
             case 2:{
-                int fdFifo = open("FIFO", O_WRONLY);
                 write(fdFifo,buf,n);
-                close(fdFifo);
+                
                 break;
             }
             default: {write(1,"ERRO\n",5);}
         }
     }
-    
+    close(fdFifo);  
     
     return 0; 
 } 
