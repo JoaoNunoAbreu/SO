@@ -7,6 +7,12 @@
 
 #define BUFFSIZE 10000
 
+char* removeEnter(char* str){
+    char* p = str;
+    p[strlen(p)-1] = 0;
+    return p;
+}
+
 long strToInt(char* str){
 
     char *ptr;
@@ -104,6 +110,7 @@ int main(){
         int cv_sv = open("cv_sv", O_RDONLY);
         int sv_cv = open("sv_cv", O_WRONLY);
         char buf[BUFFSIZE];
+        int vendas = open("VENDAS.txt", O_CREAT | O_TRUNC | O_WRONLY, 0666);
         while(1){
             int n = read(cv_sv,buf,sizeof buf); 
             if(n <= 0) break;
@@ -112,11 +119,32 @@ int main(){
             if(tamanho == 2){
                 char* res = somador(info[0],info[1]);
                 write(sv_cv,res,strlen(res));
+
+                long montante = 0;
+                int artigos = open("ARTIGOS.txt", O_RDONLY, 0666);
+                int tamanho2;
+                while(1){
+                    tamanho2 = 0;
+                    char buffer[BUFFSIZE];
+                    size_t n = readln(artigos,buffer,sizeof buffer);
+                    if(n <= 0) break;
+                    char** info2 = tokenizeArtigoDyn(buffer,&tamanho2);
+                    if(!strcmp(info2[0],info[0])){
+                        montante = strToInt(info2[2]) * strToInt(info[1]);
+                        break;
+                    }
+                }
+                close(artigos);
+                char* res1 = malloc(BUFFSIZE); res1 = concat(info[0],removeEnter(info[1]));
+                char* montanteStr = malloc(BUFFSIZE); sprintf(montanteStr,"%lu\n",montante);
+                res1 = concat(res1,montanteStr);
+                write(vendas,res1,strlen(res1));
             }
             else write(1,"ERRO\n",5);
         }
         close(cv_sv);
         close(sv_cv);
+        close(vendas);
     }
     return 0;
 }
