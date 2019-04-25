@@ -35,7 +35,7 @@ char** tokenizeArtigoDyn(char* artigo, int* tamanho) {
 
 int main(){ 
 
-    int tamanho = 0;
+    int tamanho;
     char** info;
     int cv_sv = open("cv_sv", O_WRONLY);
 
@@ -63,7 +63,7 @@ int main(){
                     if(n2 <= 0) break;
                 }
 
-                if(n1 == 0 || n2 == 0) {write(1,"ERRO\n",5);exit(1);}
+                if(n1 == 0 || n2 == 0) {write(1,"Erro em abrir ficheiro\n",23);exit(1);}
 
                 int tamanho1 = 0;
                 int tamanho2 = 0;

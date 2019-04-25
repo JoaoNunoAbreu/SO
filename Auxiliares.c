@@ -27,7 +27,7 @@ char** tokenizeArtigoDyn(char* artigo, int* tamanho) {
 
 char* concat(const char *s1, const char *s2){
 
-    char *result = malloc(strlen(s1) + strlen(s2) + 2); // +2 para o espaço e para o fim
+    char *result = malloc(strlen(s1) + strlen(s2) + 1); // +2 para o espaço e para o fim
     strcpy(result, s1);
     strcat(result, " ");
     strcat(result, s2);

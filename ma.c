@@ -22,7 +22,7 @@ ssize_t readln(int fildes, void *buf, size_t nbyte){
 
 char* concat(const char *s1, const char *s2){
 
-    char *result = malloc(strlen(s1) + strlen(s2) + 2); // +2 para o espaço e para o fim
+    char *result = malloc(strlen(s1) + strlen(s2) + 1);
     strcpy(result, s1);
     strcat(result, " ");
     strcat(result, s2);
@@ -52,17 +52,18 @@ void replacer(char* cod, char* new, int index){
     if(fPtr == -1 || fTemp == -1) {write(1,"ERRO\n",5); exit(1);}
 
     int jaSubstituiu = 0;
-    char** info;
+
     while(1){
         tamanho = 0;
         char buffer[BUFFSIZE];
-        char* newline = malloc(BUFFSIZE);
         size_t n = readln(fPtr,buffer,sizeof buffer);
         if(n <= 0) break;
-        info = tokenizeArtigoDyn(buffer,&tamanho);
+        char** info = tokenizeArtigoDyn(buffer,&tamanho);
         if(!strcmp(info[0],cod) && jaSubstituiu == 0){
             info[index] = strdup(new);
-            newline = concat(info[0],concat(info[1],info[2]));
+            char* newline = concat(info[0],concat(info[1],info[2]));
+            newline = strtok(newline,"\n\r");
+            strcat(newline,"\n");
             write(fTemp,newline,strlen(newline));
             jaSubstituiu = 1;
         }
@@ -100,11 +101,11 @@ int main(){
                 case 'i':{
                     // Parte da escrita nos ficheiros
                     char* num_1stArg = concat(info[0],info[2]); // Referência - Nome
-                    write(fd2,concat(num_1stArg,"\n"),strlen(concat(num_1stArg,"\n"))); // ---------------------------------------------
+                    write(fd2,concat(num_1stArg,"\n"),strlen(concat(num_1stArg,"\n")));
                     
                     char* num_2ndArg = concat(info[0],concat(info[0],info[3])); // Código - Referência - Preço
                     write(fd1,num_2ndArg,strlen(num_2ndArg));
-                    
+
                     // Parte do código numérico
                     char charLinha[BUFFSIZE];
                     sprintf(charLinha,"O número é: %d\n",line); 
@@ -112,8 +113,7 @@ int main(){
                     break;
                 }
                 case 'n':{
-                    char* a1 = concat(info[0],info[3]);
-                    write(fd2,a1,strlen(a1));
+                    write(fd2,concat(info[0],info[3]),strlen(concat(info[0],info[3])));
                     replacer(info[2],info[0],1); // 1 pois será a referência a ser alterada
                     break;
                 }

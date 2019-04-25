@@ -51,7 +51,7 @@ char** tokenizeArtigoDyn(char* artigo, int* tamanho) {
 
 char* concat(const char *s1, const char *s2){
 
-    char *result = malloc(strlen(s1) + strlen(s2) + 2); // +2 para o espaço e para o fim
+    char *result = malloc(strlen(s1) + strlen(s2) + 1);
     strcpy(result, s1);
     strcat(result, " ");
     strcat(result, s2);
@@ -74,7 +74,6 @@ char* somador(char* cod, char* new){
     while(1){
         tamanho = 0;
         char buffer[BUFFSIZE];
-        char* newline = malloc(BUFFSIZE);
         size_t n = readln(fPtr,buffer,sizeof buffer);
         if(n <= 0){
             if(jaSubstituiu == 0) {
@@ -89,7 +88,7 @@ char* somador(char* cod, char* new){
             long res = strToInt(info[1]) + strToInt(new);
             sprintf(info[1],"%lu\n",res);
             resultado = strdup(info[1]);
-            newline = concat(info[0],info[1]);
+            char* newline = concat(info[0],info[1]);
             write(fTemp,newline,strlen(newline));
             jaSubstituiu = 1;
         }
@@ -108,7 +107,6 @@ int main(){
 
     while(1){
         int cv_sv = open("cv_sv", O_RDONLY);
-        int sv_cv = open("sv_cv", O_WRONLY);
         char buf[BUFFSIZE];
         int vendas = open("VENDAS.txt", O_CREAT | O_TRUNC | O_WRONLY, 0666);
         while(1){
@@ -117,6 +115,7 @@ int main(){
             tamanho = 0;
             char** info = tokenizeArtigoDyn(buf,&tamanho);
             if(tamanho == 2){
+                int sv_cv = open("sv_cv", O_WRONLY);
                 char* res = somador(info[0],info[1]);
                 write(sv_cv,res,strlen(res));
 
@@ -139,11 +138,11 @@ int main(){
                 char* montanteStr = malloc(BUFFSIZE); sprintf(montanteStr,"%lu\n",montante);
                 res1 = concat(res1,montanteStr);
                 write(vendas,res1,strlen(res1));
+                close(sv_cv);
             }
             else write(1,"ERRO\n",5);
         }
         close(cv_sv);
-        close(sv_cv);
         close(vendas);
     }
     return 0;
