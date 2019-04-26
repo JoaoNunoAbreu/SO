@@ -77,11 +77,13 @@ void replacer(char* cod, char* new, int index){
 
 int main(){
 
-    int fd1 = open("ARTIGOS.txt", O_CREAT | O_TRUNC | O_WRONLY, 0666); 
+    int fd1 = open("ARTIGOS.txt", O_CREAT | O_TRUNC , 0666); 
     int fd2 = open("STRINGS.txt", O_CREAT | O_TRUNC | O_WRONLY, 0666);
-    int line = 1;
     if(fd1 == -1 || fd2 == -1) {write(1,"ERRO\n",5); exit(1);}
 
+
+    int line = 1;
+    int codArtigo = 1;
     while(1){
         char *buf = malloc(BUFFSIZE);
         int pre = sprintf(buf,"%d ",line);
@@ -99,17 +101,28 @@ int main(){
         if(tamanho == 4){
             switch(buf[pre]){
                 case 'i':{
-                    // Parte da escrita nos ficheiros
-                    char* num_1stArg = concat(info[0],info[2]); // Referência - Nome
-                    write(fd2,concat(num_1stArg,"\n"),strlen(concat(num_1stArg,"\n")));
+
+                    char* codigoEmStr = malloc(BUFFSIZE);
+                    sprintf(codigoEmStr,"%d",codArtigo);
+                    char* linhaEmStr = malloc(BUFFSIZE);
+                    sprintf(linhaEmStr,"%d",line);
                     
-                    char* num_2ndArg = concat(info[0],concat(info[0],info[3])); // Código - Referência - Preço
+                    // Parte da escrita nos ficheiros
+                    char* num_1stArg = concat(linhaEmStr,info[2]); // Referência - Nome
+                    write(fd2,concat(num_1stArg,"\n"),strlen(concat(num_1stArg,"\n")));
+
+                    // Porque depois de o replacer executar, não temos o ARTIGOS.txt original aberto pois o replacer cria uma cópia.
+                    fd1 = open("ARTIGOS.txt", O_APPEND | O_WRONLY, 0666);
+                    char* num_2ndArg = concat(codigoEmStr,concat(linhaEmStr,info[3])); // Código - Referência - Preço
                     write(fd1,num_2ndArg,strlen(num_2ndArg));
 
-                    // Parte do código numérico
+                    // Print no stdout do código do artigo
                     char charLinha[BUFFSIZE];
-                    sprintf(charLinha,"O número é: %d\n",line); 
+                    sprintf(charLinha,"Código: %d\n",codArtigo);
                     write(1,charLinha,strlen(charLinha));
+                    codArtigo++;
+                    free(codigoEmStr);
+                    free(linhaEmStr);
                     break;
                 }
                 case 'n':{
@@ -127,5 +140,7 @@ int main(){
         }
         else write(1,"Formato errado\n",16);
     }
+    close(fd1);
+    close(fd2);
     return 0;
 }
