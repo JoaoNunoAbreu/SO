@@ -63,23 +63,24 @@ int main(){
                     if(n2 <= 0) break;
                 }
 
-                if(n1 == 0 || n2 == 0) {write(1,"Erro em abrir ficheiro\n",23);exit(1);}
+                if(n1 == 0) write(1,"O número que inseriu não é um código de um artigo.\n",55);
+                else if(n2 == 0) write(1,"O código de artigo inserido não tem um stock associado.\n",58);
+                else{
+                    int tamanho1 = 0;
+                    int tamanho2 = 0;
 
-                int tamanho1 = 0;
-                int tamanho2 = 0;
+                    buffer1[n1] = '\0';
+                    buffer2[n2] = '\0';
 
-                buffer1[n1] = '\0';
-                buffer2[n2] = '\0';
+                    char** info1 = tokenizeArtigoDyn(buffer1,&tamanho1);
+                    char** info2 = tokenizeArtigoDyn(buffer2,&tamanho2);
 
-                char** info1 = tokenizeArtigoDyn(buffer1,&tamanho1);
-                char** info2 = tokenizeArtigoDyn(buffer2,&tamanho2);
+                    char* preco = malloc(BUFFSIZE); strcat(strcat(preco,"O preço é: "),info1[2]);
+                    char* stock = malloc(BUFFSIZE); strcat(strcat(stock,"O stock é: "),info2[1]);
 
-                char* preco = malloc(BUFFSIZE); strcat(strcat(preco,"O preço é: "),info1[2]);
-                char* stock = malloc(BUFFSIZE); strcat(strcat(stock,"O stock é: "),info2[1]);
-
-                write(1,preco,strlen(preco));
-                write(1,stock,strlen(stock));
-
+                    write(1,preco,strlen(preco));
+                    write(1,stock,strlen(stock));
+                }
                 close(fdArtigos);
                 close(fdStocks);
                 break;
