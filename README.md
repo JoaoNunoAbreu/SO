@@ -1,4 +1,4 @@
-# Ler pdf do enunciado
+# Sistemas Operativos 18/19
 
 ## Artigos.txt
 
@@ -11,3 +11,7 @@
 ## Stocks.txt
 
 * Tem a quantidade de cada artigo
+
+## Vendas.txt
+
+* Código - Stock - Montante (stock * preço)

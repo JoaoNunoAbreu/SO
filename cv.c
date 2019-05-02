@@ -20,9 +20,9 @@ ssize_t readln(int fildes, void *buf, size_t nbyte){
     return i;
 }
 
-char** tokenizeArtigoDyn(char* artigo, int* tamanho) {
+char** tokenizeArtigoDyn(char* artigo, int* tamanho, int quantos) {
     
-    char** artigos = (char**) malloc(3 * sizeof(char*));
+    char** artigos = (char**) malloc(quantos * sizeof(char*));
     char* temp = strdup(artigo);
     char* token = strtok(temp," ");
     while(token != NULL){
@@ -33,18 +33,22 @@ char** tokenizeArtigoDyn(char* artigo, int* tamanho) {
     return artigos;
 }
 
-int main(){ 
+int main(int argc, char* argv[]){ 
 
     int tamanho;
     char** info;
     int cv_sv = open("cv_sv", O_WRONLY);
+    int contador = 0;
+    int fd = 0;
+    if(argc == 2) fd = open(argv[1],O_RDONLY);
 
     while(1){
         tamanho = 0;
-        char *buf = malloc(BUFFSIZE);
-        ssize_t n = readln(0,buf,BUFFSIZE);
+        char buf[BUFFSIZE];
+        ssize_t n = readln(fd,buf,BUFFSIZE);
         if (n <= 0) break;
-        info = tokenizeArtigoDyn(buf,&tamanho);
+        contador++;
+        info = tokenizeArtigoDyn(buf,&tamanho,2);
         switch(tamanho){
             case 1:{
                 int fdArtigos = open("ARTIGOS.txt",O_RDONLY, 0666);
@@ -62,6 +66,7 @@ int main(){
                     if(n1 <= 0) break;
                     if(n2 <= 0) break;
                 }
+                free(info[0]);
 
                 if(n1 == 0) write(1,"O número que inseriu não é um código de um artigo.\n",55);
                 else if(n2 == 0) write(1,"O código de artigo inserido não tem um stock associado.\n",58);
@@ -72,14 +77,16 @@ int main(){
                     buffer1[n1] = '\0';
                     buffer2[n2] = '\0';
 
-                    char** info1 = tokenizeArtigoDyn(buffer1,&tamanho1);
-                    char** info2 = tokenizeArtigoDyn(buffer2,&tamanho2);
+                    char** info1 = tokenizeArtigoDyn(buffer1,&tamanho1,2);
+                    char** info2 = tokenizeArtigoDyn(buffer2,&tamanho2,2);
 
                     char* preco = malloc(BUFFSIZE); strcat(strcat(preco,"O preço é: "),info1[2]);
                     char* stock = malloc(BUFFSIZE); strcat(strcat(stock,"O stock é: "),info2[1]);
+                    free(info1); free(info2);
 
                     write(1,preco,strlen(preco));
                     write(1,stock,strlen(stock));
+                    free(preco); free(stock);
                 }
                 close(fdArtigos);
                 close(fdStocks);
@@ -89,15 +96,16 @@ int main(){
                 write(cv_sv,buf,n);
                 char buffer[BUFFSIZE];
                 int sv_cv = open("sv_cv", O_RDONLY);
-                int n = read(sv_cv, buffer, sizeof buffer);
-                write(1,buffer,n);
+                int n = readln(sv_cv, buffer, sizeof buffer);
+                //write(1,buffer,n);
                 close(sv_cv);
                 break;
             }
-            default: {write(1,"ERRO\n",5);}
+            default: {write(1,"Erro no tamanho do cv\n",22);}
         }
+        if(contador % 1000 == 0) printf("Foram lidas %d linhas\n",contador);
     }
-    close(cv_sv); 
-    
+    close(cv_sv);
+
     return 0; 
 } 

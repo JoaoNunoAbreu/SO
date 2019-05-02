@@ -12,9 +12,9 @@ ssize_t readln(int fildes, void *buf, size_t nbyte){
     return i;
 }
 
-char** tokenizeArtigoDyn(char* artigo, int* tamanho) {
+char** tokenizeArtigoDyn(char* artigo, int* tamanho, int quantos) {
     
-    char** artigos = (char**) malloc(3 * sizeof(char*));
+    char** artigos = (char**) malloc(quantos * sizeof(char*));
     char* temp = strdup(artigo);
     char* token = strtok(temp," ");
     while(token != NULL){
