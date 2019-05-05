@@ -1,37 +1,8 @@
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "Auxiliares.h"
 
-#define BUFFSIZE 10000
-
-ssize_t readln(int fildes, void *buf, size_t nbyte){
-
-    char *b = buf;
-    size_t i = 0;
-
-    while(i < nbyte){
-        ssize_t n = read(fildes,&b[i],1);
-        if (n <= 0) break;
-        if(b[i] == '\n') return (i+1);
-        i++;
-    }
-    return i;
-}
-
-char* concat(const char *s1, const char *s2){
-
-    char *result = malloc(strlen(s1) + strlen(s2) + 1);
-    strcpy(result, s1);
-    strcat(result, " ");
-    strcat(result, s2);
-    return result;
-}
-
-char** tokenizeArtigoDyn(char* artigo, int* tamanho) {
+char** tokenizeArtigoDyn(char* artigo, int* tamanho, int quantos) {
     
-    char** artigos = (char**) malloc(3 * sizeof(char*));
+    char** artigos = (char**) malloc(quantos * sizeof(char*));
     char* temp = strdup(artigo);
     char* token = strtok(temp," ");
     while(token != NULL){
@@ -58,7 +29,7 @@ void replacer(char* cod, char* new, int index){
         char buffer[BUFFSIZE];
         size_t n = readln(fPtr,buffer,sizeof buffer);
         if(n <= 0) break;
-        char** info = tokenizeArtigoDyn(buffer,&tamanho);
+        char** info = tokenizeArtigoDyn(buffer,&tamanho,3);
         if(!strcmp(info[0],cod) && jaSubstituiu == 0){
             info[index] = strdup(new);
             char* newline = concat(info[0],concat(info[1],info[2]));
@@ -72,8 +43,6 @@ void replacer(char* cod, char* new, int index){
     remove("ARTIGOS.txt");
     rename("replace.tmp", "ARTIGOS.txt");
 }
-
-// ------------------------------------------------------------------------------------------------
 
 int main(){
 
@@ -91,7 +60,7 @@ int main(){
         if (n <= 0) break;
 
         int tamanho = 0;
-        char** info = tokenizeArtigoDyn(buf,&tamanho);
+        char** info = tokenizeArtigoDyn(buf,&tamanho,4);
         /*
         * info[0] = código
         * info[1] = letra
@@ -101,7 +70,6 @@ int main(){
         if(tamanho == 4){
             switch(buf[pre]){
                 case 'i':{
-
                     char* codigoEmStr = malloc(BUFFSIZE);
                     sprintf(codigoEmStr,"%d",codArtigo);
                     char* linhaEmStr = malloc(BUFFSIZE);

@@ -1,5 +1,7 @@
 # Sistemas Operativos 18/19
 
+## Usar make para compilar
+
 ## Artigos.txt
 
 * Código - Referência - Preço  
@@ -10,7 +12,7 @@
 
 ## Stocks.txt
 
-* Tem a quantidade de cada artigo
+* Código - Stock total
 
 ## Vendas.txt
 

@@ -1,11 +1,4 @@
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-
-#define BUFFSIZE 10000
+#include "Auxiliares.h"
 
 char* removeEnter(char* str){
     char* p = str;
@@ -22,20 +15,6 @@ long strToInt(char* str){
     return ret;
 }
 
-ssize_t readln(int fildes, void *buf, size_t nbyte){
-
-    char *b = buf;
-    size_t i = 0;
-
-    while(i < nbyte){
-        ssize_t n = read(fildes,&b[i],1);
-        if (n <= 0) break;
-        if(b[i] == '\n') return (i+1);
-        i++;
-    }
-    return i;
-}
-
 char** tokenizeArtigoDyn(char* artigo, int* tamanho, int quantos) {
     
     char** artigos = (char**) malloc(quantos * sizeof(char*));
@@ -47,15 +26,6 @@ char** tokenizeArtigoDyn(char* artigo, int* tamanho, int quantos) {
         *tamanho = *tamanho + 1;
     }
     return artigos;
-}
-
-char* concat(const char *s1, const char *s2){
-
-    char *result = malloc(strlen(s1) + strlen(s2) + 1);
-    strcpy(result, s1);
-    strcat(result, " ");
-    strcat(result, s2);
-    return result;
 }
 
 char* somador(char* cod, char* new){
@@ -145,10 +115,7 @@ int main(){
                 write(vendas,res1,strlen(res1));
                 free(res1); free(montanteStr);
             }
-            else {
-                printf("Tamanho foi %d\n",tamanho);
-                write(1,"Erro no tamanho do sv\n",22);exit(1);
-            }
+            else {write(1,"Erro no tamanho do sv\n",22);exit(1);}
             free(info);
         }
         close(cv_sv);

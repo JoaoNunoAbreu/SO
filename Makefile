@@ -1,17 +1,20 @@
 CC = gcc
 CFLAGS = -Wall -O2
+OBJFILES = Auxiliares
 
-maExec: 
-	$(CC) $(CFLAGS) ma.c -o ma ma.o
+all: ma sv cv ag
 
-serverExec:
-	$(CC) $(CFLAGS) server.c -o server server.o
+ma: $(OBJFILES)
+	$(CC) $(CFLAGS) -o ma ma.c Auxiliares.o
 
-clienteExec: 
-	$(CC) $(CFLAGS) cliente.c -o cliente cliente.o
+sv: $(OBJFILES)
+	$(CC) $(CFLAGS) -o sv sv.c Auxiliares.o
 
-exec: 
-	$(CC) $(CFLAGS) -c ma.c cliente.c servidor.c
+cv: $(OBJFILES)
+	$(CC) $(CFLAGS) -o cv cv.c Auxiliares.o
 
-clean:
-	rm ma server cliente
+ag: $(OBJFILES)
+	$(CC) $(CFLAGS) -o ag ag.c Auxiliares.o
+
+Auxiliares:
+	$(CC) $(CFLAGS) -c Auxiliares.c

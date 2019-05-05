@@ -1,24 +1,4 @@
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-
-#define BUFFSIZE 10000
-
-ssize_t readln(int fildes, void *buf, size_t nbyte){
-
-    char *b = buf;
-    size_t i = 0;
-
-    while(i < nbyte){
-        ssize_t n = read(fildes,&b[i],1);
-        if (n <= 0) break;
-        if(b[i] == '\n') return (i+1);
-        i++;
-    }
-    return i;
-}
+#include "Auxiliares.h"
 
 char** tokenizeArtigoDyn(char* artigo, int* tamanho, int quantos) {
     
@@ -97,15 +77,14 @@ int main(int argc, char* argv[]){
                 char buffer[BUFFSIZE];
                 int sv_cv = open("sv_cv", O_RDONLY);
                 int n = readln(sv_cv, buffer, sizeof buffer);
-                //write(1,buffer,n);
+                if(argc == 1)write(1,buffer,n);
                 close(sv_cv);
                 break;
             }
             default: {write(1,"Erro no tamanho do cv\n",22);}
         }
-        if(contador % 1000 == 0) printf("Foram lidas %d linhas\n",contador);
     }
     close(cv_sv);
 
     return 0; 
-} 
+}
