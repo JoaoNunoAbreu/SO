@@ -1,4 +1,5 @@
 #include "Auxiliares.h"
+#include <time.h>
 
 char* removeEnter(char* str){
     char* p = str;
@@ -71,17 +72,27 @@ int main(){
     int tamanho;
     int tamanho2;
     int montante = 0;
+    int vendas = open("VENDAS.txt", O_CREAT | O_TRUNC | O_WRONLY, 0666);
 
     while(1){
         int cv_sv = open("cv_sv", O_RDONLY);
-        int vendas = open("VENDAS.txt", O_CREAT | O_TRUNC | O_WRONLY, 0666);
         while(1){
             char buf[BUFFSIZE];
             int n = readln(cv_sv,buf,sizeof buf); 
             if(n <= 0) break;
             tamanho = 0;
             char** info = tokenizeArtigoDyn(buf,&tamanho,2);
-            if(tamanho == 2){
+            if(tamanho == 1 && buf[0] == 'a'){
+                // Momento da agregação 
+                time_t rawtime;
+                struct tm* timeinfo;
+                time(&rawtime);
+                timeinfo = localtime (&rawtime);
+                if(!fork()){ // Para o que processo filho faça o exec e não termine com o programa
+                    execlp("./ag","./ag",asctime(timeinfo),(char*) 0);
+                }
+            }
+            else if(tamanho == 2){
                 int sv_cv = open("sv_cv", O_WRONLY);
                 char* res = somador(info[0],info[1]);
                 write(sv_cv,res,strlen(res));

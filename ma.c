@@ -50,10 +50,11 @@ int main(){
     int fd2 = open("STRINGS.txt", O_CREAT | O_TRUNC | O_WRONLY, 0666);
     if(fd1 == -1 || fd2 == -1) {write(1,"ERRO\n",5); exit(1);}
 
-
     int line = 1;
     int codArtigo = 1;
+
     while(1){
+        int cv_sv = open("cv_sv", O_WRONLY);
         char *buf = malloc(BUFFSIZE);
         int pre = sprintf(buf,"%d ",line);
         ssize_t n = readln(0,buf+pre,BUFFSIZE-pre); // Código numérico + linha lida
@@ -102,12 +103,13 @@ int main(){
                 break;
             }
             case 'a':{
-                execlp("./ag","./ag",(char*) 0);
+                write(cv_sv,"a\n",2);
                 break;
             }
             default: {write(1,"Formato errado\n",16);line--;}
         }
         line++;
+        close(cv_sv);
     }
     close(fd1);
     close(fd2);

@@ -1,5 +1,11 @@
 #include "Auxiliares.h"
 
+char* removeEnter(char* str){
+    char* p = str;
+    if(p[strlen(p)-1] == '\n') p[strlen(p)-1] = 0;
+    return p;
+}
+
 void addSemRep(int v[], int k){
 
     int i;
@@ -25,12 +31,14 @@ char** tokenizeArtigoDyn(char* artigo, int* tamanho, int quantos){
     return artigos;
 }
 
-int main(){
+int main(int argc, char* argv[]){
 
     int fd1  = open("VENDAS.txt", O_RDONLY, 0666);
     int codArtigos[BUFFSIZE];
     int tamanho1,tamanho2;
     int sumStock, sumMontante;
+    int fdDest = 1;
+    if(argc == 2) fdDest = open(strcat(removeEnter(argv[1]),".txt"), O_CREAT | O_WRONLY,0666);
 
     while(1){ // Percorre o ficheiro de vendas para ver quantos códigos de artigo há
         tamanho1 = 0;
@@ -58,11 +66,10 @@ int main(){
                 sumMontante += atoi(info[2]);
             }
         }
-
         char* codigoStr   = malloc(BUFFSIZE); sprintf(codigoStr,"%d",codArtigos[i]);
         char* stockStr    = malloc(BUFFSIZE); sprintf(stockStr,"%d",sumStock);
         char* montanteStr = malloc(BUFFSIZE); sprintf(montanteStr,"%d\n",sumMontante);
-        write(1,concat(concat(codigoStr,stockStr),montanteStr),strlen(concat(concat(codigoStr,stockStr),montanteStr)));
+        write(fdDest,concat(concat(codigoStr,stockStr),montanteStr),strlen(concat(concat(codigoStr,stockStr),montanteStr)));
     }
     close(fd2);
     return 0;
