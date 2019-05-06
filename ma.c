@@ -67,46 +67,47 @@ int main(){
         * info[2] = 1º argumento
         * info[3] = 2º argumento
         */
-        if(tamanho == 4){
-            switch(buf[pre]){
-                case 'i':{
-                    char* codigoEmStr = malloc(BUFFSIZE);
-                    sprintf(codigoEmStr,"%d",codArtigo);
-                    char* linhaEmStr = malloc(BUFFSIZE);
-                    sprintf(linhaEmStr,"%d",line);
+        switch(buf[pre]){
+            case 'i':{
+                char* codigoEmStr = malloc(BUFFSIZE);
+                sprintf(codigoEmStr,"%d",codArtigo);
+                char* linhaEmStr = malloc(BUFFSIZE);
+                sprintf(linhaEmStr,"%d",line);
                     
-                    // Parte da escrita nos ficheiros
-                    char* num_1stArg = concat(linhaEmStr,info[2]); // Referência - Nome
-                    write(fd2,concat(num_1stArg,"\n"),strlen(concat(num_1stArg,"\n")));
+                // Parte da escrita nos ficheiros
+                char* num_1stArg = concat(linhaEmStr,info[2]); // Referência - Nome
+                write(fd2,concat(num_1stArg,"\n"),strlen(concat(num_1stArg,"\n")));
 
-                    // Porque depois de o replacer executar, não temos o ARTIGOS.txt original aberto pois o replacer cria uma cópia.
-                    fd1 = open("ARTIGOS.txt", O_APPEND | O_WRONLY, 0666);
-                    char* num_2ndArg = concat(codigoEmStr,concat(linhaEmStr,info[3])); // Código - Referência - Preço
-                    write(fd1,num_2ndArg,strlen(num_2ndArg));
+                // Porque depois de o replacer executar, não temos o ARTIGOS.txt original aberto pois o replacer cria uma cópia.
+                fd1 = open("ARTIGOS.txt", O_APPEND | O_WRONLY, 0666);
+                char* num_2ndArg = concat(codigoEmStr,concat(linhaEmStr,info[3])); // Código - Referência - Preço
+                write(fd1,num_2ndArg,strlen(num_2ndArg));
 
-                    // Print no stdout do código do artigo
-                    char charLinha[BUFFSIZE];
-                    sprintf(charLinha,"Código: %d\n",codArtigo);
-                    write(1,charLinha,strlen(charLinha));
-                    codArtigo++;
-                    free(codigoEmStr);
-                    free(linhaEmStr);
-                    break;
-                }
-                case 'n':{
-                    write(fd2,concat(info[0],info[3]),strlen(concat(info[0],info[3])));
-                    replacer(info[2],info[0],1); // 1 pois será a referência a ser alterada
-                    break;
-                }
-                case 'p':{
-                    replacer(info[2],info[3],2); // 2 pois será o preço a ser alterado
-                    break;
-                }
-                default: write(1,"Formato errado\n",16);
+                // Print no stdout do código do artigo
+                char charLinha[BUFFSIZE];
+                sprintf(charLinha,"Código: %d\n",codArtigo);
+                write(1,charLinha,strlen(charLinha));
+                codArtigo++;
+                free(codigoEmStr);
+                free(linhaEmStr);
+                break;
             }
-            line++;
+            case 'n':{
+                write(fd2,concat(info[0],info[3]),strlen(concat(info[0],info[3])));
+                replacer(info[2],info[0],1); // 1 pois será a referência a ser alterada
+                break;
+            }
+            case 'p':{
+                replacer(info[2],info[3],2); // 2 pois será o preço a ser alterado
+                break;
+            }
+            case 'a':{
+                execlp("./ag","./ag",(char*) 0);
+                break;
+            }
+            default: {write(1,"Formato errado\n",16);line--;}
         }
-        else write(1,"Formato errado\n",16);
+        line++;
     }
     close(fd1);
     close(fd2);

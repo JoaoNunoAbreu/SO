@@ -2,17 +2,8 @@
 
 char* removeEnter(char* str){
     char* p = str;
-    p[strlen(p)-1] = 0;
+    if(p[strlen(p)-1] == '\n') p[strlen(p)-1] = 0;
     return p;
-}
-
-long strToInt(char* str){
-
-    char *ptr;
-    long ret;
-    ret = strtol(str, &ptr, 10);
-
-    return ret;
 }
 
 char** tokenizeArtigoDyn(char* artigo, int* tamanho, int quantos) {
@@ -55,8 +46,9 @@ char* somador(char* cod, char* new){
         }
         info = tokenizeArtigoDyn(buffer,&tamanho,2);
         if(!strcmp(info[0],cod) && jaSubstituiu == 0){
-            long res = strToInt(info[1]) + strToInt(new);
-            sprintf(info[1],"%lu\n",res);
+            int res = atoi(info[1]) + atoi(new);
+            if(res < 0) res = 0; // Para não dar stocks negativos
+            sprintf(info[1],"%d\n",res);
             resultado = strdup(info[1]);
             char* newline = concat(info[0],info[1]);
             write(fTemp,newline,strlen(newline));
@@ -78,7 +70,7 @@ int main(){
     mkfifo("sv_cv",0666);
     int tamanho;
     int tamanho2;
-    long montante = 0;
+    int montante = 0;
 
     while(1){
         int cv_sv = open("cv_sv", O_RDONLY);
@@ -101,19 +93,22 @@ int main(){
                     char buffer[BUFFSIZE];
                     size_t n = readln(artigos,buffer,sizeof buffer);
                     if(n <= 0) break;
-                    char** info2 = tokenizeArtigoDyn(buffer,&tamanho2,2);
+                    char** info2 = tokenizeArtigoDyn(buffer,&tamanho2,3);
                     if(!strcmp(info2[0],info[0])){
-                        montante = strToInt(info2[2]) * strToInt(info[1]);
+                        montante = atoi(info2[2]) * abs(atoi(info[1]));
                         break;
                     }
                     free(info2);
                 }
                 close(artigos);
-                char* res1 = malloc(BUFFSIZE); res1 = concat(info[0],removeEnter(info[1]));
-                char* montanteStr = malloc(BUFFSIZE); sprintf(montanteStr,"%lu\n",montante);
-                res1 = concat(res1,montanteStr);
-                write(vendas,res1,strlen(res1));
-                free(res1); free(montanteStr);
+                if(atoi(info[1]) < 0){
+                    sprintf(info[1],"%d\n",abs(atoi(info[1])));
+                    char* res1 = malloc(BUFFSIZE); res1 = concat(info[0],removeEnter(info[1]));
+                    char* montanteStr = malloc(BUFFSIZE); sprintf(montanteStr,"%d\n",abs(montante));
+                    res1 = concat(res1,montanteStr);
+                    write(vendas,res1,strlen(res1));
+                    free(res1); free(montanteStr);
+                }
             }
             else {write(1,"Erro no tamanho do sv\n",22);exit(1);}
             free(info);
