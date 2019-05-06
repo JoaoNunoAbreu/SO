@@ -1,12 +1,6 @@
 #include "Auxiliares.h"
 #include <time.h>
 
-char* removeEnter(char* str){
-    char* p = str;
-    if(p[strlen(p)-1] == '\n') p[strlen(p)-1] = 0;
-    return p;
-}
-
 char** tokenizeArtigoDyn(char* artigo, int* tamanho, int quantos) {
     
     char** artigos = (char**) malloc(quantos * sizeof(char*));

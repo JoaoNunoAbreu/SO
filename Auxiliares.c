@@ -22,3 +22,9 @@ char* concat(const char *s1, const char *s2){
     strcat(result, s2);
     return result;
 }
+
+char* removeEnter(char* str){
+    char* p = str;
+    if(p[strlen(p)-1] == '\n') p[strlen(p)-1] = 0;
+    return p;
+}

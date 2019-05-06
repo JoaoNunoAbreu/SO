@@ -1,11 +1,5 @@
 #include "Auxiliares.h"
 
-char* removeEnter(char* str){
-    char* p = str;
-    if(p[strlen(p)-1] == '\n') p[strlen(p)-1] = 0;
-    return p;
-}
-
 void addSemRep(int v[], int k){
 
     int i;

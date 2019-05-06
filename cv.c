@@ -83,6 +83,7 @@ int main(int argc, char* argv[]){
             }
             default: {write(1,"Erro no tamanho do cv\n",22);}
         }
+        if(contador % 1000 == 0) printf("Foram lidas %d linhas.\n",contador);
     }
     close(cv_sv);
 

@@ -8,4 +8,4 @@
 
 ssize_t readln(int fildes, void *buf, size_t nbyte);
 char* concat(const char *s1, const char *s2);
-// colocar removentere
+char* removeEnter(char* str);
