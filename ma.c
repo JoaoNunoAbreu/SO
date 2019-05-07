@@ -49,12 +49,12 @@ int main(){
     int fd1 = open("ARTIGOS.txt", O_CREAT | O_TRUNC , 0666); 
     int fd2 = open("STRINGS.txt", O_CREAT | O_TRUNC | O_WRONLY, 0666);
     if(fd1 == -1 || fd2 == -1) {write(1,"ERRO\n",5); exit(1);}
+    int cv_sv = open("cv_sv", O_WRONLY);
 
     int line = 1;
     int codArtigo = 1;
 
     while(1){
-        int cv_sv = open("cv_sv", O_WRONLY);
         char *buf = malloc(BUFFSIZE);
         int pre = sprintf(buf,"%d ",line);
         ssize_t n = readln(0,buf+pre,BUFFSIZE-pre); // Código numérico + linha lida
@@ -72,25 +72,27 @@ int main(){
             case 'i':{
                 char* codigoEmStr = malloc(BUFFSIZE);
                 sprintf(codigoEmStr,"%d",codArtigo);
-                char* linhaEmStr = malloc(BUFFSIZE);
-                sprintf(linhaEmStr,"%d",line);
                     
                 // Parte da escrita nos ficheiros
-                char* num_1stArg = concat(linhaEmStr,info[2]); // Referência - Nome
+                char* num_1stArg = concat(codigoEmStr,info[2]); // Referência - Nome
                 write(fd2,concat(num_1stArg,"\n"),strlen(concat(num_1stArg,"\n")));
 
                 // Porque depois de o replacer executar, não temos o ARTIGOS.txt original aberto pois o replacer cria uma cópia.
                 fd1 = open("ARTIGOS.txt", O_APPEND | O_WRONLY, 0666);
-                char* num_2ndArg = concat(codigoEmStr,concat(linhaEmStr,info[3])); // Código - Referência - Preço
+                char* num_2ndArg = concat(codigoEmStr,concat(codigoEmStr,info[3])); // Código - Referência - Preço
                 write(fd1,num_2ndArg,strlen(num_2ndArg));
 
                 // Print no stdout do código do artigo
                 char charLinha[BUFFSIZE];
                 sprintf(charLinha,"Código: %d\n",codArtigo);
                 write(1,charLinha,strlen(charLinha));
+
+                char novopreco[BUFFSIZE];
+                sprintf(novopreco,"p %d %d\n",codArtigo,atoi(info[3]));
+                write(cv_sv,novopreco,strlen(novopreco));
+
                 codArtigo++;
                 free(codigoEmStr);
-                free(linhaEmStr);
                 break;
             }
             case 'n':{
@@ -100,17 +102,18 @@ int main(){
             }
             case 'p':{
                 replacer(info[2],info[3],2); // 2 pois será o preço a ser alterado
+                write(cv_sv,buf+pre,n);
                 break;
             }
             case 'a':{
-                write(cv_sv,"a\n",2);
+                write(cv_sv,buf+pre,n);
                 break;
             }
             default: {write(1,"Formato errado\n",16);line--;}
         }
         line++;
-        close(cv_sv);
     }
+    close(cv_sv);
     close(fd1);
     close(fd2);
     return 0;

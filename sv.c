@@ -63,10 +63,11 @@ int main(){
 
     mkfifo("cv_sv",0666);
     mkfifo("sv_cv",0666);
+
     int tamanho;
-    int tamanho2;
     int montante = 0;
     int vendas = open("VENDAS.txt", O_CREAT | O_TRUNC | O_WRONLY, 0666);
+    int precos[BUFFSIZE]; // Array que contem preços dos artigos correspondentes do índice
 
     while(1){
         int cv_sv = open("cv_sv", O_RDONLY);
@@ -75,37 +76,28 @@ int main(){
             int n = readln(cv_sv,buf,sizeof buf); 
             if(n <= 0) break;
             tamanho = 0;
-            char** info = tokenizeArtigoDyn(buf,&tamanho,2);
-            if(tamanho == 1 && buf[0] == 'a'){
+            char** info = tokenizeArtigoDyn(buf,&tamanho,3);
+            if(tamanho == 3 && !strcmp(info[0],"a")){
                 // Momento da agregação 
                 time_t rawtime;
                 struct tm* timeinfo;
                 time(&rawtime);
                 timeinfo = localtime (&rawtime);
                 if(!fork()){ // Para o que processo filho faça o exec e não termine com o programa
-                    execlp("./ag","./ag",asctime(timeinfo),(char*) 0);
+                    execlp("./ag","./ag",asctime(timeinfo),info[1],info[2],(char*) 0);
                 }
             }
+            else if(tamanho == 3 && !strcmp(info[0],"p")){
+                precos[atoi(info[1])-1] = atoi(info[2]);
+            }
             else if(tamanho == 2){
+
                 int sv_cv = open("sv_cv", O_WRONLY);
                 char* res = somador(info[0],info[1]);
                 write(sv_cv,res,strlen(res));
                 close(sv_cv);
+                montante = precos[atoi(info[0])-1] * abs(atoi(info[1]));
 
-                int artigos = open("ARTIGOS.txt", O_RDONLY, 0666);
-                while(1){
-                    tamanho2 = 0;
-                    char buffer[BUFFSIZE];
-                    size_t n = readln(artigos,buffer,sizeof buffer);
-                    if(n <= 0) break;
-                    char** info2 = tokenizeArtigoDyn(buffer,&tamanho2,3);
-                    if(!strcmp(info2[0],info[0])){
-                        montante = atoi(info2[2]) * abs(atoi(info[1]));
-                        break;
-                    }
-                    free(info2);
-                }
-                close(artigos);
                 if(atoi(info[1]) < 0){
                     sprintf(info[1],"%d\n",abs(atoi(info[1])));
                     char* res1 = malloc(BUFFSIZE); res1 = concat(info[0],removeEnter(info[1]));
@@ -115,11 +107,12 @@ int main(){
                     free(res1); free(montanteStr);
                 }
             }
-            else {write(1,"Erro no tamanho do sv\n",22);exit(1);}
+            else {write(1,"Erro no tamanho do sv\n",22);}
             free(info);
         }
         close(cv_sv);
-        close(vendas);
     }
+    close(vendas);
+    free(precos);
     return 0;
 }

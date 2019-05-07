@@ -17,3 +17,8 @@
 ## Vendas.txt
 
 * Código - Stock - Montante (stock * preço)
+
+## TO DO
+
+* O ma não pode eliminar o ficheiro VENDAS.txt quando é executado porque depois o agregador não ia funcionar
+* Por o agregador a funcionar com intervalos

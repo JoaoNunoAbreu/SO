@@ -32,33 +32,47 @@ int main(int argc, char* argv[]){
     int tamanho1,tamanho2;
     int sumStock, sumMontante;
     int fdDest = 1;
-    if(argc == 2) fdDest = open(strcat(removeEnter(argv[1]),".txt"), O_CREAT | O_WRONLY,0666);
-
+    int inicio,fim; inicio = fim = 0;
+    if(argc == 4){
+        inicio = atoi(argv[2])-1;
+        fim = atoi(argv[3])-1;
+        fdDest = open(strcat(removeEnter(argv[1]),".txt"), O_CREAT | O_TRUNC | O_WRONLY,0666);
+    }
+    int contador = 0;
     while(1){ // Percorre o ficheiro de vendas para ver quantos códigos de artigo há
         tamanho1 = 0;
         char buffer[BUFFSIZE];
         size_t n = readln(fd1,buffer,sizeof buffer);
         if(n <= 0) break;
-        char** info = tokenizeArtigoDyn(buffer,&tamanho1,3);
-        addSemRep(codArtigos,atoi(info[0]));
+        if(contador >= inicio && contador <= fim){
+            char** info = tokenizeArtigoDyn(buffer,&tamanho1,3);
+            addSemRep(codArtigos,atoi(info[0]));
+            free(info);
+        }
+        contador++;
     }
     close(fd1);
+    //for(int i = 0; codArtigos[i];i++) printf("codArtigos[%d] = %d\n",i,codArtigos[i]);
 
     int fd2 = open("VENDAS.txt", O_RDONLY, 0666);
     for(int i = 0; codArtigos[i]; i++){ // Volta a percorrer o ficheiro de vendas para agregar os dados
 
         lseek(fd2,0,SEEK_SET); // Põe a apontar para o início do ficheiro
         sumStock = sumMontante = 0;
+        contador = 0;
         while(1){
             tamanho2 = 0;
             char buffer[BUFFSIZE];
             size_t n = readln(fd2,buffer,sizeof buffer);
             if(n <= 0) break;
-            char** info = tokenizeArtigoDyn(buffer,&tamanho2,3);
-            if(atoi(info[0]) == codArtigos[i]){
-                sumStock += atoi(info[1]);
-                sumMontante += atoi(info[2]);
+            if(contador >= inicio && contador <= fim){
+                char** info = tokenizeArtigoDyn(buffer,&tamanho2,3);
+                if(atoi(info[0]) == codArtigos[i]){
+                    sumStock += atoi(info[1]);
+                    sumMontante += atoi(info[2]);
+                }
             }
+            contador++;
         }
         char* codigoStr   = malloc(BUFFSIZE); sprintf(codigoStr,"%d",codArtigos[i]);
         char* stockStr    = malloc(BUFFSIZE); sprintf(stockStr,"%d",sumStock);
