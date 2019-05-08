@@ -77,7 +77,9 @@ int main(){
             if(n <= 0) break;
             tamanho = 0;
             char** info = tokenizeArtigoDyn(buf,&tamanho,3);
-            if(tamanho == 3 && !strcmp(info[0],"a")){
+
+            // ---- Agregação com intervalos ----
+            if(tamanho == 3 && !strcmp(info[0],"a")){ 
                 // Momento da agregação 
                 time_t rawtime;
                 struct tm* timeinfo;
@@ -85,11 +87,45 @@ int main(){
                 timeinfo = localtime (&rawtime);
                 if(!fork()){ // Para o que processo filho faça o exec e não termine com o programa
                     execlp("./ag","./ag",asctime(timeinfo),info[1],info[2],(char*) 0);
+                    _exit(0);
                 }
             }
+            // ------ Agregação concorrente -----
+            else if(tamanho == 2 && !strcmp(info[0],"a")){
+                int nLinhas = contaLinhas("VENDAS.txt");
+                if(nLinhas < atoi(info[1])){
+                    write(1,"Mais bocados do que linhas\n",27);
+                }
+                else{
+                    int pa = 1;
+                    int sa = atoi(info[1]);
+                    // Momento da agregação 
+                    time_t rawtime;
+                    struct tm* timeinfo;
+                    time(&rawtime);
+                    timeinfo = localtime (&rawtime);
+                    for(int i = 0; i < atoi(info[1]); i++){
+                        char* bufpa = malloc(BUFFSIZE); sprintf(bufpa,"%d",pa);
+                        char* bufsa = malloc(BUFFSIZE); sprintf(bufsa,"%d",sa);
+                        if(!fork()){
+                            execlp("./ag","./ag",asctime(timeinfo),bufpa,bufsa,(char*) 0);
+                            _exit(0);
+                        }
+                        free(bufpa);free(bufsa);
+                        if(pa + atoi(info[1]) > nLinhas) pa = nLinhas; else pa += atoi(info[1]);
+                        if(sa + atoi(info[1]) > nLinhas) sa = sa + (nLinhas % atoi(info[1])); else sa += atoi(info[1]);
+                    }
+                    for(int i = 0; i < atoi(info[1]); i++){
+                        int status;
+                        wait(&status);
+                    }
+                }
+            }
+            // ------- Caching de preços --------
             else if(tamanho == 3 && !strcmp(info[0],"p")){
                 precos[atoi(info[1])-1] = atoi(info[2]);
             }
+            // ------- Cliente de vendas --------
             else if(tamanho == 2){
 
                 int sv_cv = open("sv_cv", O_WRONLY);
@@ -100,14 +136,14 @@ int main(){
 
                 if(atoi(info[1]) < 0){
                     sprintf(info[1],"%d\n",abs(atoi(info[1])));
-                    char* res1 = malloc(BUFFSIZE); res1 = concat(info[0],removeEnter(info[1]));
+                    char* res1 = concat(info[0],removeEnter(info[1]));
                     char* montanteStr = malloc(BUFFSIZE); sprintf(montanteStr,"%d\n",abs(montante));
                     res1 = concat(res1,montanteStr);
                     write(vendas,res1,strlen(res1));
                     free(res1); free(montanteStr);
                 }
             }
-            else {write(1,"Erro no tamanho do sv\n",22);}
+            else {write(1,"Erro no código lido do pipe\n",28);}
             free(info);
         }
         close(cv_sv);

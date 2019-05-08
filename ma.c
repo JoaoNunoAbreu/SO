@@ -72,14 +72,17 @@ int main(){
             case 'i':{
                 char* codigoEmStr = malloc(BUFFSIZE);
                 sprintf(codigoEmStr,"%d",codArtigo);
+
+                char* linhaEmStr = malloc(BUFFSIZE);
+                sprintf(linhaEmStr,"%d",line);
                     
                 // Parte da escrita nos ficheiros
-                char* num_1stArg = concat(codigoEmStr,info[2]); // Referência - Nome
+                char* num_1stArg = concat(linhaEmStr,info[2]); // Referência - Nome
                 write(fd2,concat(num_1stArg,"\n"),strlen(concat(num_1stArg,"\n")));
 
                 // Porque depois de o replacer executar, não temos o ARTIGOS.txt original aberto pois o replacer cria uma cópia.
                 fd1 = open("ARTIGOS.txt", O_APPEND | O_WRONLY, 0666);
-                char* num_2ndArg = concat(codigoEmStr,concat(codigoEmStr,info[3])); // Código - Referência - Preço
+                char* num_2ndArg = concat(codigoEmStr,concat(linhaEmStr,info[3])); // Código - Referência - Preço
                 write(fd1,num_2ndArg,strlen(num_2ndArg));
 
                 // Print no stdout do código do artigo
@@ -91,13 +94,14 @@ int main(){
                 sprintf(novopreco,"p %d %d\n",codArtigo,atoi(info[3]));
                 write(cv_sv,novopreco,strlen(novopreco));
 
-                codArtigo++;
+                codArtigo++; line++;
                 free(codigoEmStr);
                 break;
             }
             case 'n':{
                 write(fd2,concat(info[0],info[3]),strlen(concat(info[0],info[3])));
                 replacer(info[2],info[0],1); // 1 pois será a referência a ser alterada
+                line++;
                 break;
             }
             case 'p':{
@@ -109,9 +113,9 @@ int main(){
                 write(cv_sv,buf+pre,n);
                 break;
             }
-            default: {write(1,"Formato errado\n",16);line--;}
+            default: {write(1,"Formato errado\n",16);}
         }
-        line++;
+        
     }
     close(cv_sv);
     close(fd1);

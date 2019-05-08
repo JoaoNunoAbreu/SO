@@ -9,3 +9,4 @@
 ssize_t readln(int fildes, void *buf, size_t nbyte);
 char* concat(const char *s1, const char *s2);
 char* removeEnter(char* str);
+int contaLinhas(char* file);

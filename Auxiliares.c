@@ -28,3 +28,17 @@ char* removeEnter(char* str){
     if(p[strlen(p)-1] == '\n') p[strlen(p)-1] = 0;
     return p;
 }
+
+int contaLinhas(char* file){
+
+    int filefd = open(file, O_RDONLY, 0666);
+    int count = 0;
+    while(1){
+        char buf[100];
+        int n = readln(filefd,buf,sizeof buf);
+        if(n <= 0) break;
+        count++;
+    }
+    close(filefd);
+    return count;
+}

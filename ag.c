@@ -36,7 +36,7 @@ int main(int argc, char* argv[]){
     if(argc == 4){
         inicio = atoi(argv[2])-1;
         fim = atoi(argv[3])-1;
-        fdDest = open(strcat(removeEnter(argv[1]),".txt"), O_CREAT | O_TRUNC | O_WRONLY,0666);
+        fdDest = open(strcat(removeEnter(argv[1]),".txt"), O_CREAT | O_APPEND | O_WRONLY,0666);
     }
     int contador = 0;
     while(1){ // Percorre o ficheiro de vendas para ver quantos códigos de artigo há
@@ -52,7 +52,6 @@ int main(int argc, char* argv[]){
         contador++;
     }
     close(fd1);
-    //for(int i = 0; codArtigos[i];i++) printf("codArtigos[%d] = %d\n",i,codArtigos[i]);
 
     int fd2 = open("VENDAS.txt", O_RDONLY, 0666);
     for(int i = 0; codArtigos[i]; i++){ // Volta a percorrer o ficheiro de vendas para agregar os dados
