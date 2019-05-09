@@ -115,7 +115,6 @@ int main(){
             }
             default: {write(1,"Formato errado\n",16);}
         }
-        
     }
     close(cv_sv);
     close(fd1);

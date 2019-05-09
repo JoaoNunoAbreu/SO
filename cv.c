@@ -17,10 +17,8 @@ int main(int argc, char* argv[]){
 
     int tamanho;
     char** info;
-    int cv_sv = open("cv_sv", O_WRONLY);
     int contador = 0;
     int fd = 0;
-    if(argc == 2) fd = open(argv[1],O_RDONLY);
 
     while(1){
         tamanho = 0;
@@ -73,19 +71,19 @@ int main(int argc, char* argv[]){
                 break;
             }
             case 2:{
+                int cv_sv = open("cv_sv", O_WRONLY);
                 write(cv_sv,buf,n);
-                char buffer[BUFFSIZE];
+                close(cv_sv);
+
                 int sv_cv = open("sv_cv", O_RDONLY);
-                int n = readln(sv_cv, buffer, sizeof buffer);
-                if(argc == 1)write(1,buffer,n);
+                char buffer[BUFFSIZE];
+                int n = read(sv_cv, buffer, sizeof buffer);
+                write(1,buffer,n);
                 close(sv_cv);
                 break;
             }
             default: {write(1,"Erro no tamanho do cv\n",22);}
         }
-        if(contador % 1000 == 0) printf("Foram lidas %d linhas.\n",contador);
     }
-    close(cv_sv);
-
     return 0; 
 }

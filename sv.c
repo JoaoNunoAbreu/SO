@@ -69,8 +69,9 @@ int main(){
     int vendas = open("VENDAS.txt", O_CREAT | O_TRUNC | O_WRONLY, 0666);
     int precos[BUFFSIZE]; // Array que contem preços dos artigos correspondentes do índice
 
+    signal(SIGPIPE,SIG_IGN);
     while(1){
-        int cv_sv = open("cv_sv", O_RDONLY);
+        int cv_sv = open("cv_sv", O_RDONLY);    
         while(1){
             char buf[BUFFSIZE];
             int n = readln(cv_sv,buf,sizeof buf); 
@@ -98,13 +99,17 @@ int main(){
                 }
                 else{
                     int pa = 1;
-                    int sa = atoi(info[1]);
+                    int sa = nLinhas / (atoi(info[1]));
+                    if(nLinhas % (atoi(info[1])) > 1) sa++;
+                    int valorInitSa = sa;
                     // Momento da agregação 
                     time_t rawtime;
                     struct tm* timeinfo;
                     time(&rawtime);
                     timeinfo = localtime (&rawtime);
-                    for(int i = 0; i < atoi(info[1]); i++){
+                    int eof = 0;
+                    int i;
+                    for(i = 0; !eof ; i++){
                         char* bufpa = malloc(BUFFSIZE); sprintf(bufpa,"%d",pa);
                         char* bufsa = malloc(BUFFSIZE); sprintf(bufsa,"%d",sa);
                         if(!fork()){
@@ -112,10 +117,11 @@ int main(){
                             _exit(0);
                         }
                         free(bufpa);free(bufsa);
-                        if(pa + atoi(info[1]) > nLinhas) pa = nLinhas; else pa += atoi(info[1]);
-                        if(sa + atoi(info[1]) > nLinhas) sa = sa + (nLinhas % atoi(info[1])); else sa += atoi(info[1]);
+                        if(pa == nLinhas || sa == nLinhas) eof = 1;
+                        if(sa+1 > nLinhas) pa = nLinhas; else pa = sa + 1;
+                        if(sa + sa > nLinhas) sa = nLinhas; else sa += valorInitSa;
                     }
-                    for(int i = 0; i < atoi(info[1]); i++){
+                    for(int j = 0; j < i; j++){
                         int status;
                         wait(&status);
                     }
@@ -143,12 +149,10 @@ int main(){
                     free(res1); free(montanteStr);
                 }
             }
-            else {write(1,"Erro no código lido do pipe\n",28);}
+            else {write(1,"Erro no código lido do pipe\n",29);}
             free(info);
         }
         close(cv_sv);
     }
-    close(vendas);
-    free(precos);
     return 0;
 }

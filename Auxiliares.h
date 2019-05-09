@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-#define BUFFSIZE 10000
+#define BUFFSIZE 1000
 
 ssize_t readln(int fildes, void *buf, size_t nbyte);
 char* concat(const char *s1, const char *s2);
