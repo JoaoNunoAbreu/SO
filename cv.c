@@ -20,6 +20,10 @@ int main(int argc, char* argv[]){
     int contador = 0;
     int fd = 0;
 
+    char my_fifo_name[BUFFSIZE];
+    sprintf(my_fifo_name,"fifo_client_%ld", (long) getpid());
+    mkfifo (my_fifo_name, 0666);
+
     while(1){
         tamanho = 0;
         char buf[BUFFSIZE];
@@ -71,19 +75,28 @@ int main(int argc, char* argv[]){
                 break;
             }
             case 2:{
-                int cv_sv = open("cv_sv", O_WRONLY);
-                write(cv_sv,buf,n);
-                close(cv_sv);
+                char* linha = strtok(buf,"\n\r");
+                char buf2[BUFFSIZE];
 
-                int sv_cv = open("sv_cv", O_RDONLY);
+                strcpy(buf2,my_fifo_name);
+                strcat(buf2," ");
+                strcat(buf2,linha);
+                strcat(buf2,"\n");
+
+                int fd_server = open("fifo_server", O_WRONLY);
+                write(fd_server,buf2,strlen(buf2));
+                close(fd_server);
+
+                int fd = open(my_fifo_name, O_RDONLY);
                 char buffer[BUFFSIZE];
-                int n = read(sv_cv, buffer, sizeof buffer);
+                int n = read(fd,buffer,sizeof buffer);
                 write(1,buffer,n);
-                close(sv_cv);
+                close(fd);
                 break;
             }
             default: {write(1,"Erro no tamanho do cv\n",22);}
         }
+        if(contador % 1000 == 0) printf("Foram lidas %d linhas\n",contador);
     }
     return 0; 
 }

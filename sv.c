@@ -61,24 +61,23 @@ char* somador(char* cod, char* new){
 
 int main(){
 
-    mkfifo("cv_sv",0666);
-    mkfifo("sv_cv",0666);
+    mkfifo("fifo_server",0666);
+    char *return_fifo;
 
     int tamanho;
     int montante = 0;
     int vendas = open("VENDAS.txt", O_CREAT | O_TRUNC | O_WRONLY, 0666);
-    int precos[BUFFSIZE]; // Array que contem preços dos artigos correspondentes do índice
+    int precos[BUFFSIZE] = {}; // Array que contem preços dos artigos correspondentes do índice
 
     signal(SIGPIPE,SIG_IGN);
     while(1){
-        int cv_sv = open("cv_sv", O_RDONLY);    
+        int fd = open("fifo_server", O_RDONLY);    
         while(1){
             char buf[BUFFSIZE];
-            int n = readln(cv_sv,buf,sizeof buf); 
+            int n = read(fd,buf,sizeof buf); 
             if(n <= 0) break;
             tamanho = 0;
-            char** info = tokenizeArtigoDyn(buf,&tamanho,3);
-
+            char** info = tokenizeArtigoDyn(buf,&tamanho,4);
             // ---- Agregação com intervalos ----
             if(tamanho == 3 && !strcmp(info[0],"a")){ 
                 // Momento da agregação 
@@ -132,17 +131,19 @@ int main(){
                 precos[atoi(info[1])-1] = atoi(info[2]);
             }
             // ------- Cliente de vendas --------
-            else if(tamanho == 2){
+            else if(tamanho == 3){
 
-                int sv_cv = open("sv_cv", O_WRONLY);
-                char* res = somador(info[0],info[1]);
-                write(sv_cv,res,strlen(res));
-                close(sv_cv);
-                montante = precos[atoi(info[0])-1] * abs(atoi(info[1]));
+                return_fifo = strtok (buf,", \n");
+                int fd_client = open(return_fifo, O_WRONLY);
+                char* res = somador(info[1],info[2]);
+                write(fd_client,res,strlen(res));
+                close(fd_client);
 
-                if(atoi(info[1]) < 0){
-                    sprintf(info[1],"%d\n",abs(atoi(info[1])));
-                    char* res1 = concat(info[0],removeEnter(info[1]));
+                montante = precos[atoi(info[1])-1] * abs(atoi(info[2]));
+
+                if(atoi(info[2]) < 0){
+                    sprintf(info[2],"%d",abs(atoi(info[2])));
+                    char* res1 = concat(info[1],info[2]);
                     char* montanteStr = malloc(BUFFSIZE); sprintf(montanteStr,"%d\n",abs(montante));
                     res1 = concat(res1,montanteStr);
                     write(vendas,res1,strlen(res1));
@@ -152,7 +153,7 @@ int main(){
             else {write(1,"Erro no código lido do pipe\n",29);}
             free(info);
         }
-        close(cv_sv);
+        close(fd);
     }
     return 0;
 }

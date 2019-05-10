@@ -49,7 +49,7 @@ int main(){
     int fd1 = open("ARTIGOS.txt", O_CREAT | O_TRUNC , 0666); 
     int fd2 = open("STRINGS.txt", O_CREAT | O_TRUNC | O_WRONLY, 0666);
     if(fd1 == -1 || fd2 == -1) {write(1,"ERRO\n",5); exit(1);}
-    int cv_sv = open("cv_sv", O_WRONLY);
+    int fd_server = open("fifo_server", O_WRONLY);
 
     int line = 1;
     int codArtigo = 1;
@@ -92,7 +92,7 @@ int main(){
 
                 char novopreco[BUFFSIZE];
                 sprintf(novopreco,"p %d %d\n",codArtigo,atoi(info[3]));
-                write(cv_sv,novopreco,strlen(novopreco));
+                write(fd_server,novopreco,strlen(novopreco));
 
                 codArtigo++; line++;
                 free(codigoEmStr);
@@ -106,17 +106,17 @@ int main(){
             }
             case 'p':{
                 replacer(info[2],info[3],2); // 2 pois será o preço a ser alterado
-                write(cv_sv,buf+pre,n);
+                write(fd_server,buf+pre,n);
                 break;
             }
             case 'a':{
-                write(cv_sv,buf+pre,n);
+                write(fd_server,buf+pre,n);
                 break;
             }
             default: {write(1,"Formato errado\n",16);}
         }
     }
-    close(cv_sv);
+    close(fd_server);
     close(fd1);
     close(fd2);
     return 0;
