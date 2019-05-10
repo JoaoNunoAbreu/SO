@@ -115,6 +115,10 @@ int main(){
             }
             default: {write(1,"Formato errado\n",16);}
         }
+        if(!fork()){
+            execlp("./compact","./compact",(char*) 0);
+            _exit(0);
+        }
     }
     close(fd_server);
     close(fd1);

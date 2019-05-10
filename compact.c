@@ -9,7 +9,7 @@ int elem (int a[], int var) {
     
 }
 
-void remRep(int s1[], int s2[], int s3[]){
+int remRep(int s1[], int s2[], int s3[]){
     
     int count = 0;
 
@@ -20,6 +20,7 @@ void remRep(int s1[], int s2[], int s3[]){
         if(!elem(s1,s2[i])) s3[count++] = s2[i];
     }
     s3[count] = '\0';
+    return count;
 }
 
 char** tokenizeArtigoDyn(char* artigo, int* tamanho, int quantos){
@@ -63,7 +64,8 @@ int main(){
     int strings = open("STRINGS.txt",O_RDONLY, 0666);
     int tamanho1, tamanho2; int contador;
 
-    int refsArtigos[BUFFSIZE]; int refsString[BUFFSIZE];
+    int refsArtigos[BUFFSIZE] = {};
+    int refsString[BUFFSIZE] = {};
 
     // Percorre o ficheiro de artigos
     contador = 0;
@@ -78,7 +80,7 @@ int main(){
     close(artigos);
 
     // Percorre o ficheiro de strings
-    contador = 0;
+    contador = 0; int nLinhasStrings = 0;
     while(1){ 
         tamanho2 = 0;
         char buf2[BUFFSIZE];
@@ -86,14 +88,16 @@ int main(){
         if(n2 <= 0) break;
         char** info2 = tokenizeArtigoDyn(buf2,&tamanho2,3);
         refsString[contador++] = atoi(info2[0]);
+        nLinhasStrings++;
     }
     close(strings);
 
-    int porRemover[BUFFSIZE];
-    remRep(refsArtigos,refsString,porRemover);
-    for(int i = 0; porRemover[i]; i++){
-        deleteLinhas(porRemover[i],"STRINGS.txt");
+    int porRemover[BUFFSIZE] = {};
+    int linhasLixo = remRep(refsArtigos,refsString,porRemover);
+    
+    if((double)linhasLixo / (double)nLinhasStrings > 0.2){
+        for(int i = 0; porRemover[i]; i++)
+            deleteLinhas(porRemover[i],"STRINGS.txt");
     }
-
     return 0;
 }

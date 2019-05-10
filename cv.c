@@ -98,5 +98,6 @@ int main(int argc, char* argv[]){
         }
         if(contador % 1000 == 0) printf("Foram lidas %d linhas\n",contador);
     }
+    remove(my_fifo_name);
     return 0; 
 }

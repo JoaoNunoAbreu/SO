@@ -16,7 +16,7 @@ ssize_t readln(int fildes, void *buf, size_t nbyte){
 
 char* concat(const char *s1, const char *s2){
 
-    char *result = malloc(strlen(s1) + strlen(s2) + 1); // +2 para o espaço e para o fim
+    char *result = malloc(strlen(s1) + strlen(s2) + 1);
     strcpy(result, s1);
     strcat(result, " ");
     strcat(result, s2);
@@ -41,4 +41,14 @@ int contaLinhas(char* file){
     }
     close(filefd);
     return count;
+}
+
+char* getTime(){
+
+    time_t rawtime;
+    struct tm* timeinfo;
+    time(&rawtime);
+    timeinfo = localtime (&rawtime);
+
+    return removeEnter(asctime(timeinfo));
 }

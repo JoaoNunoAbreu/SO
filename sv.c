@@ -1,5 +1,4 @@
 #include "Auxiliares.h"
-#include <time.h>
 
 char** tokenizeArtigoDyn(char* artigo, int* tamanho, int quantos) {
     
@@ -12,6 +11,24 @@ char** tokenizeArtigoDyn(char* artigo, int* tamanho, int quantos) {
         *tamanho = *tamanho + 1;
     }
     return artigos;
+}
+
+void portionOf(char* input, char* output, int inicio, int fim){
+
+    int fdI = open(input,O_RDONLY);
+    int fdO = open(output, O_CREAT | O_WRONLY | O_TRUNC, 0666);
+    int count = 1;
+
+    while(1){
+        char buffer[BUFFSIZE];
+        size_t n = readln(fdI,buffer,sizeof buffer);
+        if(n <= 0) break;
+        if(count >= inicio && count <= fim)
+            write(fdO,buffer,n);
+        count++;
+    }
+    close(fdI);
+    close(fdO);
 }
 
 char* somador(char* cod, char* new){
@@ -78,44 +95,71 @@ int main(){
             if(n <= 0) break;
             tamanho = 0;
             char** info = tokenizeArtigoDyn(buf,&tamanho,4);
+
             // ---- Agregação com intervalos ----
-            if(tamanho == 3 && !strcmp(info[0],"a")){ 
-                // Momento da agregação 
-                time_t rawtime;
-                struct tm* timeinfo;
-                time(&rawtime);
-                timeinfo = localtime (&rawtime);
-                if(!fork()){ // Para o que processo filho faça o exec e não termine com o programa
-                    execlp("./ag","./ag",asctime(timeinfo),info[1],info[2],(char*) 0);
-                    _exit(0);
+
+            if(tamanho == 3 && !strcmp(info[0],"a")){
+
+                char* temp = "temp.txt";
+                portionOf("VENDAS.txt",temp,atoi(info[1]),atoi(info[2]));
+                
+                if(!fork()){
+                    fd = open(temp,O_RDONLY);
+                    dup2(fd,0);
+                    close(fd);
+
+                    fd = open(strcat(getTime(),".txt"),O_CREAT | O_WRONLY | O_TRUNC,0666);
+                    dup2(fd,1);
+                    close(fd);
+
+                    execlp("./ag","./ag",(char*) 0);
+                    _exit(1);
                 }
+                int status;
+                wait(&status);
+                remove(temp);
             }
+
             // ------ Agregação concorrente -----
+
             else if(tamanho == 2 && !strcmp(info[0],"a")){
                 int nLinhas = contaLinhas("VENDAS.txt");
                 if(nLinhas < atoi(info[1])){
                     write(1,"Mais bocados do que linhas\n",27);
                 }
                 else{
+                    int fd;
+                    int nLinhas = contaLinhas("VENDAS.txt");
                     int pa = 1;
                     int sa = nLinhas / (atoi(info[1]));
                     if(nLinhas % (atoi(info[1])) > 1) sa++;
-                    int valorInitSa = sa;
-                    // Momento da agregação 
-                    time_t rawtime;
-                    struct tm* timeinfo;
-                    time(&rawtime);
-                    timeinfo = localtime (&rawtime);
-                    int eof = 0;
+                    int valorInitSa = sa; 
+                    int eof = 0; 
                     int i;
+
+                    char fich_data[BUFFSIZE];
+                    sprintf(fich_data,"%s.txt",getTime());
+
                     for(i = 0; !eof ; i++){
-                        char* bufpa = malloc(BUFFSIZE); sprintf(bufpa,"%d",pa);
-                        char* bufsa = malloc(BUFFSIZE); sprintf(bufsa,"%d",sa);
+
+                        char temp[BUFFSIZE];
+                        sprintf(temp,"temp%d.txt",i);
+                        portionOf("VENDAS.txt",temp,pa,sa);
+
                         if(!fork()){
-                            execlp("./ag","./ag",asctime(timeinfo),bufpa,bufsa,(char*) 0);
-                            _exit(0);
+
+                            fd = open(temp,O_RDONLY);
+                            dup2(fd,0);
+                            close(fd);
+                            remove(temp);
+
+                            fd = open(fich_data,O_CREAT | O_WRONLY | O_APPEND,0666);
+                            dup2(fd,1);
+                            close(fd);
+                
+                            execlp("./ag","./ag",(char*) 0);
+                            _exit(1);
                         }
-                        free(bufpa);free(bufsa);
                         if(pa == nLinhas || sa == nLinhas) eof = 1;
                         if(sa+1 > nLinhas) pa = nLinhas; else pa = sa + 1;
                         if(sa + sa > nLinhas) sa = nLinhas; else sa += valorInitSa;
@@ -124,13 +168,33 @@ int main(){
                         int status;
                         wait(&status);
                     }
+
+                    if(!fork()){
+                        fd = open(fich_data,O_RDONLY);
+                        dup2(fd,0);
+                        close(fd);
+                        remove(fich_data);
+
+                        fd = open(fich_data,O_CREAT | O_TRUNC | O_WRONLY ,0666);
+                        dup2(fd,1);
+                        close(fd);
+
+                        execlp("./ag","./ag",(char*) 0);
+                        _exit(1);
+                    }
+                    int status;
+                    wait(&status);
                 }
             }
+
             // ------- Caching de preços --------
+
             else if(tamanho == 3 && !strcmp(info[0],"p")){
                 precos[atoi(info[1])-1] = atoi(info[2]);
             }
+
             // ------- Cliente de vendas --------
+
             else if(tamanho == 3){
 
                 return_fifo = strtok (buf,", \n");
