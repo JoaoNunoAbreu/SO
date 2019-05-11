@@ -53,8 +53,7 @@ int main(){
     if(fd1 == -1 || fd2 == -1) {write(1,"ERRO\n",5); exit(1);}
     int fd_server = open("fifo_server", O_WRONLY);
 
-    int line = 1;
-    int codArtigo = 1;
+    int codArtigo = 1; int line = 1;
 
     while(1){
         char* buf = malloc(BUFFSIZE);
@@ -70,19 +69,20 @@ int main(){
         * info[2] = 1º argumento
         * info[3] = 2º argumento
         */
+
+        int offset = lseek(fd2,0,SEEK_END);
+        char* linhaEmStr = malloc(BUFFSIZE);
+        sprintf(linhaEmStr,"%d",offset);
+
         switch(buf[pre]){
             case 'i':{
                 char* codigoEmStr = malloc(BUFFSIZE);
                 sprintf(codigoEmStr,"%d",codArtigo);
+                        
+                // Escrita no ficheiro de strings
+                write(fd2,info[2],strlen(info[2]));
 
-                char* linhaEmStr = malloc(BUFFSIZE);
-                sprintf(linhaEmStr,"%d",line);
-                    
-                // Parte da escrita nos ficheiros
-                char* num_1stArg = concat(linhaEmStr,info[2]); // Referência - Nome
-                write(fd2,concat(num_1stArg,"\n"),strlen(concat(num_1stArg,"\n")));
-
-                // Porque depois de o replacer executar, não temos o ARTIGOS.txt original aberto pois o replacer cria uma cópia.
+                // Escrita no ficheiro de artigos
                 fd1 = open("ARTIGOS.txt", O_APPEND | O_WRONLY, 0666);
                 char* num_2ndArg = concat(codigoEmStr,concat(linhaEmStr,info[3])); // Código - Referência - Preço
                 write(fd1,num_2ndArg,strlen(num_2ndArg));
@@ -96,14 +96,13 @@ int main(){
                 sprintf(novopreco,"p %d %d\n",codArtigo,atoi(info[3]));
                 write(fd_server,novopreco,strlen(novopreco));
 
-                codArtigo++; line++;
+                codArtigo++;
                 free(codigoEmStr);
                 break;
             }
             case 'n':{
-                write(fd2,concat(info[0],info[3]),strlen(concat(info[0],info[3])));
-                replacer(info[2],info[0],1); // 1 pois será a referência a ser alterada
-                line++;
+                write(fd2,removeEnter(info[3]),strlen(removeEnter(info[3])));
+                replacer(info[2],linhaEmStr,1); // 1 pois será a referência a ser alterada
                 break;
             }
             case 'p':{
@@ -117,10 +116,10 @@ int main(){
             }
             default: {write(1,"Formato errado\n",16);}
         }
-        if(!fork()){
+        /*if(!fork()){
             execlp("./compact","./compact",(char*) 0);
             _exit(1);
-        }
+        }*/
         int status;
         wait(&status);
     }
