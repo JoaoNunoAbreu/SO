@@ -1,14 +1,5 @@
 #include "Auxiliares.h"
 
-int elem (int a[], int var) {
-    
-    int i,r = 0;
-    for (i = 0; a[i];i++)
-        if (a[i] == var) r = 1;   
-    return r;
-    
-}
-
 int remRep(int s1[], int s2[], int s3[]){
     
     int count = 0;

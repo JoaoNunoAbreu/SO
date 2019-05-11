@@ -90,7 +90,7 @@ int main(){
     while(1){
         int fd = open("fifo_server", O_RDONLY);    
         while(1){
-            char buf[BUFFSIZE];
+            char buf[BUFFSIZE] = {};
             int n = read(fd,buf,sizeof buf); 
             if(n <= 0) break;
             tamanho = 0;
@@ -141,7 +141,6 @@ int main(){
                     sprintf(fich_data,"%s.txt",getTime());
 
                     for(i = 0; !eof ; i++){
-
                         char temp[BUFFSIZE];
                         sprintf(temp,"temp%d.txt",i);
                         portionOf("VENDAS.txt",temp,pa,sa);
@@ -197,7 +196,7 @@ int main(){
 
             else if(tamanho == 3){
 
-                return_fifo = strtok (buf,", \n");
+                return_fifo = strtok(buf,", \n");
                 int fd_client = open(return_fifo, O_WRONLY);
                 char* res = somador(info[1],info[2]);
                 write(fd_client,res,strlen(res));

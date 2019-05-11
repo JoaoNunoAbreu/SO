@@ -18,16 +18,15 @@ int main(int argc, char* argv[]){
     int tamanho;
     char** info;
     int contador = 0;
-    int fd = 0;
 
     char my_fifo_name[BUFFSIZE];
     sprintf(my_fifo_name,"fifo_client_%ld", (long) getpid());
-    mkfifo (my_fifo_name, 0666);
+    mkfifo(my_fifo_name, 0666);
 
     while(1){
         tamanho = 0;
         char buf[BUFFSIZE];
-        ssize_t n = readln(fd,buf,BUFFSIZE);
+        ssize_t n = readln(0,buf,BUFFSIZE);
         if (n <= 0) break;
         contador++;
         info = tokenizeArtigoDyn(buf,&tamanho,2);
@@ -75,13 +74,12 @@ int main(int argc, char* argv[]){
                 break;
             }
             case 2:{
-                char* linha = strtok(buf,"\n\r");
+                buf[n] = '\0';
                 char buf2[BUFFSIZE];
 
                 strcpy(buf2,my_fifo_name);
                 strcat(buf2," ");
-                strcat(buf2,linha);
-                strcat(buf2,"\n");
+                strcat(buf2,buf);
 
                 int fd_server = open("fifo_server", O_WRONLY);
                 write(fd_server,buf2,strlen(buf2));

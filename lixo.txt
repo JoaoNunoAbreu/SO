@@ -2,3 +2,105 @@ Código: 1
 Código: 2
 Código: 3
 Código: 4
+array_offsets[0] = 0
+array_offsets[1] = 4
+array_offsets[2] = 7
+array_offsets[3] = 10
+array_offsets_validos[0] = 10
+array_offsets_validos[1] = 4
+array_offsets_validos[2] = 7
+length = 3
+length = 3
+length = 3
+10 11 12 4 5 6 7 8 9 
+array_offsets[0] = 6
+array_offsets[1] = 0
+array_offsets[2] = 3
+array_offsets_validos[0] = 6
+array_offsets_validos[1] = 0
+array_offsets_validos[2] = 3
+array_offsets[0] = 6
+array_offsets[1] = 0
+array_offsets[2] = 3
+array_offsets[3] = 9
+array_offsets_validos[0] = 6
+array_offsets_validos[1] = 0
+array_offsets_validos[2] = 9
+length = 3
+length = 3
+length = 5
+6 7 8 0 1 2 9 10 11 12 13 
+array_offsets[0] = 3
+array_offsets[1] = 0
+array_offsets[2] = 6
+array_offsets_validos[0] = 3
+array_offsets_validos[1] = 0
+array_offsets_validos[2] = 6
+array_offsets[0] = 3
+array_offsets[1] = 0
+array_offsets[2] = 6
+array_offsets[3] = 11
+array_offsets_validos[0] = 3
+array_offsets_validos[1] = 0
+array_offsets_validos[2] = 6
+length = 3
+length = 3
+length = 5
+3 4 5 0 1 2 6 7 8 9 10 
+array_offsets[0] = 3
+array_offsets[1] = 0
+array_offsets[2] = 6
+array_offsets_validos[0] = 3
+array_offsets_validos[1] = 0
+array_offsets_validos[2] = 6
+array_offsets[0] = 3
+array_offsets[1] = 0
+array_offsets[2] = 6
+array_offsets[3] = 11
+array_offsets_validos[0] = 3
+array_offsets_validos[1] = 11
+array_offsets_validos[2] = 6
+length = 3
+length = 5
+length = 5
+3 4 5 11 12 13 14 15 6 7 8 9 10 
+array_offsets[0] = 0
+array_offsets[1] = 8
+array_offsets[2] = 3
+array_offsets_validos[0] = 0
+array_offsets_validos[1] = 8
+array_offsets_validos[2] = 3
+array_offsets[0] = 0
+array_offsets[1] = 8
+array_offsets[2] = 3
+array_offsets[3] = 13
+array_offsets_validos[0] = 0
+array_offsets_validos[1] = 8
+array_offsets_validos[2] = 3
+length = 3
+length = 5
+length = 5
+0 1 2 8 9 10 11 12 3 4 5 6 7 
+array_offsets[0] = 0
+array_offsets[1] = 8
+array_offsets[2] = 3
+array_offsets_validos[0] = 0
+array_offsets_validos[1] = 8
+array_offsets_validos[2] = 3
+array_offsets[0] = 0
+array_offsets[1] = 8
+array_offsets[2] = 3
+array_offsets[3] = 13
+array_offsets_validos[0] = 0
+array_offsets_validos[1] = 8
+array_offsets_validos[2] = 3
+length = 3
+length = 5
+length = 5
+0 1 2 8 9 10 11 12 3 4 5 6 7 
+array_offsets[0] = 0
+array_offsets[1] = 8
+array_offsets[2] = 3
+array_offsets_validos[0] = 0
+array_offsets_validos[1] = 8
+array_offsets_validos[2] = 3
