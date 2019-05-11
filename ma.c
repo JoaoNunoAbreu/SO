@@ -40,6 +40,8 @@ void replacer(char* cod, char* new, int index){
         }
         else write(fTemp,buffer,n);
     }
+    close(fPtr);
+    close(fTemp);
     remove("ARTIGOS.txt");
     rename("replace.tmp", "ARTIGOS.txt");
 }
@@ -55,7 +57,7 @@ int main(){
     int codArtigo = 1;
 
     while(1){
-        char *buf = malloc(BUFFSIZE);
+        char* buf = malloc(BUFFSIZE);
         int pre = sprintf(buf,"%d ",line);
         ssize_t n = readln(0,buf+pre,BUFFSIZE-pre); // Código numérico + linha lida
         if (n <= 0) break;
@@ -117,8 +119,10 @@ int main(){
         }
         if(!fork()){
             execlp("./compact","./compact",(char*) 0);
-            _exit(0);
+            _exit(1);
         }
+        int status;
+        wait(&status);
     }
     close(fd_server);
     close(fd1);

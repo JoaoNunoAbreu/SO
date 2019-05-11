@@ -60,8 +60,8 @@ void deleteLinhas(int num, char* filename){
 
 int main(){
 
-    int artigos = open("ARTIGOS.txt",O_RDONLY, 0666);
-    int strings = open("STRINGS.txt",O_RDONLY, 0666);
+    int artigos = open("ARTIGOS.txt",O_RDONLY);
+    int strings = open("STRINGS.txt",O_RDONLY);
     int tamanho1, tamanho2; int contador;
 
     int refsArtigos[BUFFSIZE] = {};
@@ -96,8 +96,10 @@ int main(){
     int linhasLixo = remRep(refsArtigos,refsString,porRemover);
     
     if((double)linhasLixo / (double)nLinhasStrings > 0.2){
-        for(int i = 0; porRemover[i]; i++)
+        for(int i = 0; porRemover[i]; i++){
+            printf("porRemover[%d] = %d\n",i,porRemover[i]);
             deleteLinhas(porRemover[i],"STRINGS.txt");
+        }
     }
     return 0;
 }
