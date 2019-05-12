@@ -29,7 +29,6 @@ int intervalos_validos(int N1, int N2, int array_offsets[N1] ,int array_offsets_
     int index = 0;
 
     for(int i = 0; i < N2; i++){
-        printf("length = %d\n",length(array_offsets_validos[i],N1,array_offsets,tamanhoficheiro));
         for(int j = 0; j < length(array_offsets_validos[i],N1,array_offsets,tamanhoficheiro); j++){
             res[index++] = array_offsets_validos[i] + j;
         }
@@ -45,8 +44,6 @@ void compactador(int N1, int N2, int array_offsets[N1], int array_offsets_valido
     int res[BUFFSIZE] = {};
     int offset = 0; int por_apagar = 0;
     int count = intervalos_validos(N1,N2,array_offsets,array_offsets_validos,res,tamanhoficheiro);
-    for(int i = 0; i < count; i++) printf("%d ", res[i]);
-    printf("\n");
 
     while(1){
         char c = '\0';
@@ -58,9 +55,7 @@ void compactador(int N1, int N2, int array_offsets[N1], int array_offsets_valido
         }
         else{
             write(fTemp,&c,1);
-            //printf("offset = %d\n",offset);
             for(int i = 0; i < N2; i++){
-                //printf("%d\n", array_offsets_validos[i]);
                 if(array_offsets_validos[i] >= offset)
                     array_offsets_validos[i] -= por_apagar;
             }
@@ -87,6 +82,16 @@ char** tokenizeArtigoDyn(char* artigo, int* tamanho, int quantos) {
         *tamanho = *tamanho + 1;
     }
     return artigos;
+}
+
+double quant_lixo(int N1, int N2, int array_offsets[N1], int array_offsets_validos[N2]){
+
+    int sum = 0;
+
+    for(int i = 0; i < N1; i++)
+        if(!elemOf(array_offsets_validos,array_offsets[i],N2))
+            sum += min_after(N1,array_offsets,array_offsets[i]) - array_offsets[i];
+    return (double)sum;
 }
 
 void replacer(char* cod, char* new, int index){
@@ -196,8 +201,9 @@ int main(){
                 write(fd_server,buf+pre,n);
                 break;
             }
-            // a x y para agregar no intervalo x a y
-            // a x para agregar concorrentemente com x intervalos 
+            // "a" para agregar normalmente
+            // "a x y" para agregar no intervalo x a y
+            // "a x" para agregar concorrentemente com x intervalos 
             case 'a':{
                 write(fd_server,buf+pre,n);
                 break;
@@ -205,12 +211,7 @@ int main(){
             default: {write(1,"Formato errado\n",16);}
         }
 
-        if((double) (i-j) / (double) i > 0.2){
-
-            for(int x = 0; x < i; x++)
-                printf("array_offsets[%d] = %d\n",x,array_offsets[x]);
-            for(int x = 0; x < j; x++)
-                printf("array_offsets_validos[%d] = %d\n",x,array_offsets_validos[x]);
+        if(quant_lixo(i,j,array_offsets,array_offsets_validos) / (double)offset > 0.2){
 
             compactador(i,j,array_offsets,array_offsets_validos,lseek(fd2,0,SEEK_END));
             for(int i = 0; i < codArtigo; i++){
@@ -227,10 +228,6 @@ int main(){
             for(int x = 0; x < j; x++)
                 array_offsets[x] = array_offsets_validos[x];
             i = j;
-            for(int x = 0; x < i; x++)
-                printf("array_offsets[%d] = %d\n",x,array_offsets[x]);
-            for(int x = 0; x < j; x++)
-                printf("array_offsets_validos[%d] = %d\n",x,array_offsets_validos[x]);
         }
     }
     close(fd_server);
