@@ -1,9 +1,24 @@
-0
-0
-0
-100
+-800
 200
 300
-100
+-800
 200
 300
+-800
+200
+300
+-800
+200
+300
+A escrever para o server: fifo_client_3232 1 100
+A escrever para o server: fifo_client_3232 2 200
+A escrever para o server: fifo_client_3232 3 300
+A escrever para o server: fifo_client_3232 1 100
+A escrever para o server: fifo_client_3232 2 200
+A escrever para o server: fifo_client_3232 3 300
+A escrever para o server: fifo_client_3232 1 100
+A escrever para o server: fifo_client_3232 2 200
+A escrever para o server: fifo_client_3232 3 300
+A escrever para o server: fifo_client_3232 1 100
+A escrever para o server: fifo_client_3232 2 200
+A escrever para o server: fifo_client_3232 3 300

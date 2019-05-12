@@ -31,8 +31,7 @@
 * ~~Saber quando usar o compactador~~
 * ~~Por o agregador a funcionar com intervalos~~
 * ~~Mudar o ficheiro strings~~
-* Por o cv a funcionar com vários clientes diferentes
-* Resolver o problema do ficheiro de 1 milhão não ser todo lido
-* Corrigir compact
+* ~~Resolver o problema do ficheiro de 1 milhão não ser todo lido~~
+* ~~Por o cv a funcionar com vários clientes diferentes~~
+* ~~Corrigir compact~~
 * Fazer relatório
-* Fazer limpeza total ao código

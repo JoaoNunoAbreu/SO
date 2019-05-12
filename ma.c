@@ -162,9 +162,7 @@ int main(){
         switch(buf[pre]){
             case 'i':{
 
-                if(!elemOf(array_offsets_validos,offset,j)){
-                    array_offsets_validos[j++] = offset;
-                }
+                if(!elemOf(array_offsets_validos,offset,j)) array_offsets_validos[j++] = offset;
 
                 char* codigoEmStr = malloc(BUFFSIZE);
                 sprintf(codigoEmStr,"%d",codArtigo);

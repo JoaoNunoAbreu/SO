@@ -28,6 +28,7 @@ int main(int argc, char* argv[]){
         char buf[BUFFSIZE];
         ssize_t n = readln(0,buf,BUFFSIZE);
         if (n <= 0) break;
+        buf[n] = '\0';
         contador++;
         info = tokenizeArtigoDyn(buf,&tamanho,2);
         switch(tamanho){
@@ -74,7 +75,6 @@ int main(int argc, char* argv[]){
                 break;
             }
             case 2:{
-                buf[n] = '\0';
                 char buf2[BUFFSIZE];
 
                 strcpy(buf2,my_fifo_name);

@@ -59,7 +59,7 @@ char* somador(char* cod, char* new){
         info = tokenizeArtigoDyn(buffer,&tamanho,2);
         if(!strcmp(info[0],cod) && jaSubstituiu == 0){
             int res = atoi(info[1]) + atoi(new);
-            if(res < 0) res = 0; // Para não dar stocks negativos
+            //if(res < 0) res = 0; // Para não dar stocks negativos
             sprintf(info[1],"%d\n",res);
             resultado = strdup(info[1]);
             char* newline = concat(info[0],info[1]);
@@ -79,20 +79,20 @@ char* somador(char* cod, char* new){
 int main(){
 
     mkfifo("fifo_server",0666);
-    char *return_fifo;
 
-    int tamanho;
+    int tamanho; int fd;
     int montante = 0;
     int vendas = open("VENDAS.txt", O_CREAT | O_TRUNC | O_WRONLY, 0666);
     int precos[BUFFSIZE] = {}; // Array que contem preços dos artigos correspondentes do índice
 
     signal(SIGPIPE,SIG_IGN);
+    int fd_server = open("fifo_server", O_RDONLY);
     while(1){
-        int fd = open("fifo_server", O_RDONLY);    
         while(1){
-            char buf[BUFFSIZE] = {};
-            int n = read(fd,buf,sizeof buf); 
+            char buf[BUFFSIZE];
+            int n = readln(fd_server,buf,sizeof buf); 
             if(n <= 0) break;
+            buf[n] = '\0';
             tamanho = 0;
             char** info = tokenizeArtigoDyn(buf,&tamanho,4);
 
@@ -128,7 +128,6 @@ int main(){
                     write(1,"Mais bocados do que linhas\n",27);
                 }
                 else{
-                    int fd;
                     int nLinhas = contaLinhas("VENDAS.txt");
                     int pa = 1;
                     int sa = nLinhas / (atoi(info[1]));
@@ -196,7 +195,7 @@ int main(){
 
             else if(tamanho == 3){
 
-                return_fifo = strtok(buf,", \n");
+                char* return_fifo = strtok(buf," ");
                 int fd_client = open(return_fifo, O_WRONLY);
                 char* res = somador(info[1],info[2]);
                 write(fd_client,res,strlen(res));
@@ -213,10 +212,17 @@ int main(){
                     free(res1); free(montanteStr);
                 }
             }
-            else {write(1,"Erro no código lido do pipe\n",29);}
+            else{
+                write(1,"Erro no código lido do pipe\n",29);
+                printf("tamanho = %d\n",tamanho);
+                printf("n = %d\n",n);
+                printf("strlen = %lu\n",strlen(buf));
+                write(1,buf,n);
+            }
             free(info);
-        }
-        close(fd);
+        }        
     }
+    close(fd_server);
+    close(vendas);
     return 0;
 }
