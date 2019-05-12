@@ -4,11 +4,11 @@
 
 ## Artigos.txt
 
-* Código - Referência - Preço  
+* Código - Referência(byte) - Preço  
 
 ## Strings.txt
 
-* Referência - Nome
+* Nome
 
 ## Stocks.txt
 
@@ -21,6 +21,7 @@
 ## Notas
 
 * Para executar vários clientes ao mesmo tempo (neste caso 2) usar comando "./cv < file2.txt > output1.txt & ./cv < file3.txt > output2.txt &"
+* Ou "sh run.sh" para correr o conteúdo do script
 
 ## TO DO
 
@@ -34,4 +35,5 @@
 * ~~Resolver o problema do ficheiro de 1 milhão não ser todo lido~~
 * ~~Por o cv a funcionar com vários clientes diferentes~~
 * ~~Corrigir compact~~
+* ~~Ver o preço do cv no caching~~
 * Fazer relatório

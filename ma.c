@@ -152,7 +152,6 @@ int main(){
         * info[2] = 1º argumento
         * info[3] = 2º argumento
         */
-
         int fd2 = open("STRINGS.txt",O_WRONLY, 0666);
         int offset = lseek(fd2,0,SEEK_END);
         char* linhaEmStr = malloc(BUFFSIZE);

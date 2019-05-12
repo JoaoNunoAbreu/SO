@@ -59,10 +59,20 @@ char* somador(char* cod, char* new){
         info = tokenizeArtigoDyn(buffer,&tamanho,2);
         if(!strcmp(info[0],cod) && jaSubstituiu == 0){
             int res = atoi(info[1]) + atoi(new);
-            //if(res < 0) res = 0; // Para não dar stocks negativos
-            sprintf(info[1],"%d\n",res);
-            resultado = strdup(info[1]);
-            char* newline = concat(info[0],info[1]);
+            char* newline;
+            if(res >= 0){
+                sprintf(info[1],"%d\n",res);
+                resultado = strdup(info[1]);
+                newline = concat(info[0],info[1]);
+            }
+            else{
+                char* temp = malloc(BUFFSIZE);
+                sprintf(temp,"%d\n",atoi(info[1]));
+                sprintf(info[1],"neg %d\n",atoi(info[1]));
+                resultado = strdup(info[1]);
+                newline = concat(info[0],temp);
+                free(temp);
+            }
             write(fTemp,newline,strlen(newline));
             jaSubstituiu = 1;
         }
@@ -196,21 +206,30 @@ int main(){
             else if(tamanho == 3){
 
                 char* return_fifo = strtok(buf," ");
-                int fd_client = open(return_fifo, O_WRONLY);
                 char* res = somador(info[1],info[2]);
-                write(fd_client,res,strlen(res));
-                close(fd_client);
 
-                montante = precos[atoi(info[1])-1] * abs(atoi(info[2]));
+                int tamanho2 = 0;
+                char** info2 = tokenizeArtigoDyn(res,&tamanho2,2);
+                
+                int fd_client = open(return_fifo, O_WRONLY);   
 
-                if(atoi(info[2]) < 0){
-                    sprintf(info[2],"%d",abs(atoi(info[2])));
-                    char* res1 = concat(info[1],info[2]);
-                    char* montanteStr = malloc(BUFFSIZE); sprintf(montanteStr,"%d\n",abs(montante));
-                    res1 = concat(res1,montanteStr);
-                    write(vendas,res1,strlen(res1));
-                    free(res1); free(montanteStr);
+                if(tamanho2 == 2 && !strcmp(info2[0],"neg")){
+                    write(fd_client,info2[1],strlen(info2[1]));
                 }
+                else if(tamanho2 == 1){
+                    montante = precos[atoi(info[1])-1] * abs(atoi(info[2]));
+                    write(fd_client,info2[0],strlen(info2[0]));
+                    if(atoi(info[2]) < 0){
+                        sprintf(info[2],"%d",abs(atoi(info[2])));
+                        char* res1 = concat(info[1],info[2]);
+                        char* montanteStr = malloc(BUFFSIZE); sprintf(montanteStr,"%d\n",abs(montante));
+                        res1 = concat(res1,montanteStr);
+                        write(vendas,res1,strlen(res1));
+                        free(res1); free(montanteStr);
+                    }
+                }
+                free(info2);
+                close(fd_client);
             }
             else{
                 write(1,"Erro no código lido do pipe\n",29);
